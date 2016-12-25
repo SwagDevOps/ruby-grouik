@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+#
+# gem install specific_install
+# gem specific_install -l [URL]
+# e.g.
+# gem specific_install -l https://github.com/ruby/rake
+
+$0 = 'grouik'.freeze
+
+require 'pathname'
+begin
+  require Pathname.new(__dir__).join('..', 'lib', '%s.rb' % $0)
+rescue LoadError
+  begin
+    require $0
+  rescue LoadError
+    require 'rubygems'
+    require $0
+  end
+end
+
+# Process command line options and run
+exit Grouik::Cli.run
