@@ -26,6 +26,8 @@ Gem::Specification.new do |s|
                      .reject { |i| /\.gemspec\.erb$/.match(i) })
   s.require_paths = ['src/lib']
   s.homepage    = ('%s://github.com/SwagDevOps/' % [:https, s.name]).freeze
+
+  <%= project_dependencies %>
 end
 
 # Local Variables:

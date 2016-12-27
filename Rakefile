@@ -1,10 +1,17 @@
-require 'rubygems'
 require 'pathname'
 require 'pp'
+require 'rubygems'
 
-spec = Gem::Specification::load('%s/%s.gemspec' % [__dir__, :grouik])
-task :default => :gem
+class Project
+  class << self
+    def name
+      :grouik
+    end
 
-task :gem do
-  sh('gem', 'build', Pathname.new(spec.loaded_from).basename.to_s)
+    def spec
+      Gem::Specification::load('%s/%s.gemspec' % [__dir__, name])
+    end
+  end
 end
+
+Dir.glob('rake/**.rake').each {|f| load(f)}
