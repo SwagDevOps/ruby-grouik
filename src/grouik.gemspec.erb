@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   s.authors     = ['Dimitri Arrigoni']
   s.email       = 'dimitri@arrigoni.me'
   s.files       = (Dir.glob('src/**/**')
-                     .reject { |i| /\.gemspec\.erb$/.match(i) })
+                     .reject { |i| /^.+\.gemspec\.erb$/.match(i) })
   s.require_paths = ['src/lib']
   s.homepage    = ('%s://github.com/SwagDevOps/' % [:https, s.name]).freeze
 
