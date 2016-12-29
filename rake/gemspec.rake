@@ -12,6 +12,7 @@ file "#{Project.name}.gemspec" => "src/#{Project.name}.gemspec.erb" do
     output = Pathname.new(files[1])
     output.write(output.read.lines
                    .map {|l| l.rstrip }.join("\n")
-                   .gsub(/[\n]+[\n]end/, "\nend"))
+                   .gsub(/[\n]+[\n]end/, "\nend")
+                   .gsub(/[\n]{3,}(\s{2,})/, "\n\n\\1"))
   end
 end
