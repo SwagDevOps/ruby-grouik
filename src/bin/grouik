@@ -1,12 +1,8 @@
 #!/usr/bin/env ruby
-#
-# gem install specific_install
-# gem specific_install -l [URL]
-# e.g.
-# gem specific_install -l https://github.com/ruby/rake
+# frozen_string_literal: true
 
 require 'pathname'
-$0 = Pathname.new(__FILE__).basename.to_s.freeze
+$0 = Pathname.new(__FILE__).basename.to_s
 
 begin
   require Pathname.new(__dir__).join('..', 'lib', '%s.rb' % $0)
@@ -20,4 +16,5 @@ rescue LoadError
 end
 
 # Process command line options and run
+
 exit Grouik::Cli.run
