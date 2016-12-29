@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 # -*- coding: utf-8 -*-
+require 'rubygems'
+require 'bundler'
+Bundler.setup
 
 require 'optparse'
 require 'pathname'
