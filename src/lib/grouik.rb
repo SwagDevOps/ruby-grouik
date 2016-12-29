@@ -1,5 +1,5 @@
-#!/usr/bin/env ruby
 # -*- coding: utf-8 -*-
+
 require 'rubygems'
 require 'bundler'
 Bundler.setup
@@ -323,5 +323,3 @@ class Grouik
                 ]).capitalize)
   end
 end
-
-exit Grouik::Cli.run if __FILE__ == $0
