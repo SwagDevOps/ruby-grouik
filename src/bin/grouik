@@ -4,19 +4,27 @@
 require 'pathname'
 $0 = Pathname.new(__FILE__).basename.to_s
 
-[nil, '/cli'].each do |r|
+# run bundled in a development context -------------------------------
+if Pathname.new(__dir__).join('..', '..', '%s.gemspec' % $0).file?
+  require 'rubygems'
+  require 'bundler'
+  Bundler.setup(:default)
+end
+
+# require lib requirements -------------------------------------------
+[nil, :cli].each do |r|
+  req = r ? '%s/%s' % [$0, r] : $0
   begin
-    require Pathname.new(__dir__).join('..', 'lib', '%s%s' % [$0, r])
+    require Pathname.new(__dir__).join('..', 'lib', '%s' % req)
   rescue LoadError
     begin
-      require $0
+      require req
     rescue LoadError
       require 'rubygems'
-      require $0
+      require req
     end
   end
 end
 
-# Process command line options and run
-
+# process command line options and run -------------------------------
 exit Grouik::Cli.run

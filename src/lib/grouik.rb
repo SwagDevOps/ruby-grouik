@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
 
 require 'pathname'
-# runs bundled in a development context ------------------------------
-if Pathname.new(Dir.pwd).join('Gemfile.lock').file?
-  require 'rubygems'
-  require 'bundler/setup'
-end
 # loads sub(modules|classes) -----------------------------------------
 [:version, :loadable].each do |r|
   require '%s/grouik/%s' % [__dir__, r]
