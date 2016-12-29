@@ -1,6 +1,6 @@
-require 'pathname'
-require 'pp'
 require 'rubygems'
+require 'bundler'
+Bundler.setup
 
 class Project
   class << self
