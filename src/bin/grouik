@@ -5,9 +5,9 @@
 # e.g.
 # gem specific_install -l https://github.com/ruby/rake
 
-$0 = 'grouik'.freeze
-
 require 'pathname'
+$0 = Pathname.new(__FILE__).basename.to_s.freeze
+
 begin
   require Pathname.new(__dir__).join('..', 'lib', '%s.rb' % $0)
 rescue LoadError
