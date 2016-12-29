@@ -10,6 +10,10 @@ require 'yaml'
 require 'benchmark'
 require 'pp'
 
+[:version].each do |r|
+  require '%s/grouik/%s' % [__dir__, r]
+end
+
 class Grouik
   class Loadable
   end
