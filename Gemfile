@@ -1,5 +1,9 @@
+# frozen_string_literal: true
+#
 # bundle install --path vendor/bundle
 source 'https://rubygems.org'
+
+gem 'micon'
 
 group :development do
   gem 'rake', '~> 11.3'

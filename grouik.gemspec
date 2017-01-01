@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
     /^.+\.gemspec\.erb$/.match(i)
   end
 
+  s.add_runtime_dependency "micon", [">= 0"]
   s.add_development_dependency "rake", ["~> 11.3"]
   s.add_development_dependency "cliver", ["= 0.3.2"]
   s.add_development_dependency "gemspec_deps_gen", ["= 1.1.2"]
