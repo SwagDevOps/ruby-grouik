@@ -104,8 +104,7 @@ class Grouik::Cli
     rescue LoadError
     end
 
-    content = make_require_from_loadables(gen.load_all)
-    options.fetch(:output).write(content)
+    options.fetch(:output).write(gen.format)
 
     gen.display_errors
     if options[:verbose]
