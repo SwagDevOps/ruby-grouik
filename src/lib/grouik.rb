@@ -2,7 +2,7 @@
 
 require 'pathname'
 # loads sub(modules|classes) -----------------------------------------
-[:version, :loadable].each do |r|
+[:version, :loadable, :formatter].each do |r|
   require '%s/grouik/%s' % [__dir__, r]
 end
 
@@ -97,6 +97,10 @@ class Grouik
       end
     end
     @loadeds.compact
+  end
+
+  def format(options={})
+    Formatter.format(load_all, options).to_s
   end
 
   def loaded?
