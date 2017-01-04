@@ -23,7 +23,6 @@ class Grouik::Cli
         verbose: true,
         paths: ['.'],
         basedir: '.',
-        prefix: nil,
         output: STDOUT,
         ignores: [],
         require: nil,
@@ -48,8 +47,6 @@ class Grouik::Cli
       opts.banner = 'Usage: %s [options]' % self.program_name
       opts.on('--basedir=BASEDIR', 'Basedir [%s]' % options[:basedir]) \
       {|v| options[:basedir] = v}
-      opts.on('--prefix=PREFIX', 'Prefix added on paths' ) \
-      {|v| options[:prefix] = v}
       opts.on('-o=OUTPUT', '--output=OUTPUT', 'Output [/dev/stdout]') do |v|
         options[:output] = v
       end
@@ -89,7 +86,7 @@ class Grouik::Cli
       exit(Errno::EINVAL::Errno)
     end
 
-    gen = Grouik.new(*options.fetch(:paths)) do |instance|
+    gen = Grouik::Loader.new(*options.fetch(:paths)) do |instance|
       instance.basedir = options.fetch(:basedir)
       instance.ignores = options.fetch(:ignores)
     end
@@ -146,20 +143,5 @@ class Grouik::Cli
       options[k] = [options[k]] if options[k].is_a? String
     end
     options
-  end
-
-  def make_require_from_loadables(loadables)
-    lines = ['[']
-    prefix = options[:prefix]
-    if prefix
-      prefix = '%s/' % prefix unless /\//.match(prefix)
-    end
-    loadables
-      .map {|i| '%s\'%s%s\',' % [' '*2, prefix, i.path.to_s.gsub(/\.rb$/, '')]}
-      .each {|line| lines.push(line)}
-    lines += ['].each do |path|',
-              (' '*2)+'require \'%s/%s\' % [__dir__, path]',
-              'end']
-    "%s\n" % lines.join("\n")
   end
 end

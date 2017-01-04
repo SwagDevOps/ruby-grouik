@@ -3,7 +3,7 @@
 # bundle install --path vendor/bundle
 source 'https://rubygems.org'
 
-gem 'micon'
+gem 'activesupport', '~> 5.0'
 
 group :development do
   gem 'rake', '~> 11.3'

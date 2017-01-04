@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require '%s/src/lib/grouik/version' % __dir__
+require '%s/src/lib/grouik' % __dir__
 
 Gem::Specification.new do |s|
   s.name        = File.basename(__FILE__).split('.')[0]
@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
     /^.+\.gemspec\.erb$/.match(i)
   end
 
-  s.add_runtime_dependency "micon", [">= 0"]
+  s.add_runtime_dependency "activesupport", ["~> 5.0"]
   s.add_development_dependency "rake", ["~> 11.3"]
   s.add_development_dependency "cliver", ["= 0.3.2"]
   s.add_development_dependency "gemspec_deps_gen", ["= 1.1.2"]

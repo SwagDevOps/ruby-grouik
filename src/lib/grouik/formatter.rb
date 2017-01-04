@@ -31,17 +31,9 @@ class Grouik::Formatter
   protected
 
   def make_output
-    lines = ['[']
-    prefix = options[:prefix]
-    if prefix
-      prefix = '%s/' % prefix unless /\//.match(prefix)
-    end
+    lines = []
     loadables
-      .map {|i| '%s\'%s%s\',' % [' '*2, prefix, i.path.to_s.gsub(/\.rb$/, '')]}
-      .each {|line| lines.push(line)}
-    lines += ['].each do |path|',
-              (' '*2)+'require \'%s/%s\' % [__dir__, path]',
-              'end']
-    "%s\n" % lines.join("\n")
+      .map { |i| 'require \'%s\',' % i.path(loadable: true) }
+      .each { |line| lines.push(line) }.join("\n") + "\n"
   end
 end
