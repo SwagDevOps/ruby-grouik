@@ -26,6 +26,7 @@ class Grouik::Cli
         output: STDOUT,
         ignores: [],
         require: nil,
+        template: nil,
       }
     end
   end
@@ -101,7 +102,9 @@ class Grouik::Cli
     rescue LoadError
     end
 
-    options.fetch(:output).write(gen.format)
+    options
+      .fetch(:output)
+      .write(gen.format(template: options.fetch(:template)))
 
     gen.display_errors
     if options[:verbose]
