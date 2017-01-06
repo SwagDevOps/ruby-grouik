@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
   end
 
   s.add_runtime_dependency "activesupport", ["~> 5.0"]
+  s.add_runtime_dependency "tenjin", ["~> 0.7"]
   s.add_development_dependency "rake", ["~> 11.3"]
   s.add_development_dependency "cliver", ["= 0.3.2"]
   s.add_development_dependency "gemspec_deps_gen", ["= 1.1.2"]
