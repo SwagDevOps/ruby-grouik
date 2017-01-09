@@ -20,9 +20,8 @@ class Grouik::Loadable
     path = options[:absolute] ? basedir.join(base, path) : path
     path = options[:stripped] ? Pathname.new(path.to_s.gsub(/\.rb$/, '')) : path
 
-    # pp loadable?
-    if options[:loadable] and loadable?
-      return @path.to_s.gsub(/\.rb$/, '')
+    if options[:loadable]
+      return @path.to_s.gsub(/\.rb$/, '') if loadable?
     end
 
     return path
