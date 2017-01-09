@@ -12,12 +12,13 @@ module Grouik
               .strip
 
   # loads sub(modules|classes)
-  [:loader, :loadable, :formatter].each do |r|
+  [:loader, :loadable, :formatter, :process].each do |r|
     require '%s/%s' % [ActiveSupport::Inflector.underscore(name), r]
   end
 
   # dependency injection
   @components = {
+    process: Process,
     formatter: Formatter,
     loadable_factory: -> (base, path) { Loadable.new(base, path) },
   }
