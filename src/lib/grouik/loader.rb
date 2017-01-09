@@ -9,7 +9,7 @@ class Grouik::Loader
   attr_reader   :errors
   attr_reader   :stats
 
-  def initialize(*paths)
+  def initialize(paths = [])
     self.paths = paths.empty? ? ['.'] : paths
     self.basedir = '.'
     self.ignores = []
@@ -102,28 +102,6 @@ class Grouik::Loader
 
   def loaded?
     self.loadables.size == @loadeds.size
-  end
-
-  def display_errors
-    errors.each do |file, error|
-      STDERR.puts('%s: %s' % [file, error.message])
-    end
-    self
-  end
-
-  def display_status
-    message = '%s: %s files; %s iterations; %s errors (%.4f)'
-    statuses = {true  => 'success',
-                false => 'failure',}
-
-    STDERR.puts((message % \
-                [
-                  statuses.fetch(self.loaded?),
-                  loadables.size,
-                  attempts,
-                  errors.size,
-                  stats ? stats.real : 0
-                ]).capitalize)
   end
 
   protected
