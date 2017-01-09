@@ -89,7 +89,7 @@ class Grouik::Cli
       exit(Errno::EINVAL::Errno)
     end
 
-    gen = Grouik::Loader.new(*options.fetch(:paths)) do |instance|
+    gen = Grouik.get(:process).new(options.fetch(:paths)) do |instance|
       instance.basedir = options.fetch(:basedir)
       instance.ignores = options.fetch(:ignores)
     end
@@ -114,7 +114,7 @@ class Grouik::Cli
       gen.display_status
     end
 
-    return gen.loaded? ? 0 : 1
+    return gen.success? ? 0 : 1
   end
 
   def config
