@@ -5,7 +5,25 @@ require 'pp'
 require 'active_support/inflector'
 $:.unshift Pathname.new(__dir__)
 
+# Produce a ``require`` file, resolving classes dependencies
+#
+# Sample of use:
+#
+# ~~~~
+# Grouik.process do |gr|
+#      gr.basedir   = './path/to/my/project'
+#      gr.paths     = ['lib']
+#      gr.ignores   = []
+#      gr.output    = '/dev/stdout'
+#      gr.template  = 'lib/main'
+#      gr.bootstrap = nil
+#      gr.verbose   = true
+# end.success? ? 0 : 1
+# ~~~~
+#
+# or using command line.
 module Grouik
+  # Version
   VERSION = Pathname.new(__dir__)
               .join(ActiveSupport::Inflector.underscore(name), 'VERSION')
               .read
@@ -16,7 +34,6 @@ module Grouik
     require '%s/%s' % [ActiveSupport::Inflector.underscore(name), r]
   end
 
-  # dependency injection
   @components = {
     process_class: Process,
     formatter: Formatter,
@@ -26,11 +43,18 @@ module Grouik
   class << self
     attr_accessor :components
 
+    # Access to components
+    #
+    # @param name [String, Symbol] name of component
+    # @return [Object]
+    # @see Grouik.components
     def get(name)
       components.fetch(name.to_sym)
     end
 
-    # return [Grouik::Process]
+    # Initialize a Process and process it
+    #
+    # @return [Grouik::Process]
     def process(&block)
       self.get(:process_class).new(&block).process
     end

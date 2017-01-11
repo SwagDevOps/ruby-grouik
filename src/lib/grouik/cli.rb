@@ -81,12 +81,15 @@ class Grouik::Cli
     self
   end
 
+  # Execute CLI and return exit code
+  #
+  # @return [Fixnum]
   def run
     parse!
     if ARGV.empty? and config.empty?
       STDERR.puts(parser)
-      STDERR.puts("\nCan not run without arguments and empty config.")
-      exit(Errno::EINVAL::Errno)
+      STDERR.puts("\nCan not run without arguments and empty configuration.")
+      return Errno::EINVAL::Errno
     end
 
     return Grouik.process do |instance|
@@ -100,6 +103,9 @@ class Grouik::Cli
     end.success? ? 0 : 1
   end
 
+  # Read default config file
+  #
+  # @return Hash
   def config
     file = Pathname.new(Dir.pwd).join('%s.yml' % self.program_name)
     if file.exist? and file.file?

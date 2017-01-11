@@ -5,7 +5,6 @@ require 'pathname'
 # or as standalone (for example in a Rake task)
 class Grouik::Process
   attr_accessor :template
-  attr_accessor :output
   attr_accessor :bootstrap
   attr_accessor :verbose
 
@@ -38,11 +37,11 @@ class Grouik::Process
       end
     end
     display_errors
+    @output.write(loader.format(template: @template))
     if verbose?
       STDERR.write("\n") unless errors.empty?
       display_status
     end
-    output.write(loader.format(template: @template))
     self
   end
 
