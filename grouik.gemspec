@@ -25,6 +25,9 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rake", ["~> 11.3"]
   s.add_development_dependency "cliver", ["= 0.3.2"]
   s.add_development_dependency "gemspec_deps_gen", ["= 1.1.2"]
+  s.add_development_dependency "yard", ["~> 0.9"]
+  s.add_development_dependency "redcarpet", ["~> 3.4"]
+  s.add_development_dependency "github-markup", ["~> 1.4"]
 end
 
 # Local Variables:
