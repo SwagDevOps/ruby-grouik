@@ -1,20 +1,24 @@
 # frozen_string_literal: true
-
-require 'pathname'
-require 'yard'
-require 'securerandom'
+#
+# see: https://gist.github.com/chetan/1827484
 
 desc "Generate documentation (using YARD)"
 task :doc do
-  paths = ['src/lib']
-  build = 'doc:build:%s' % SecureRandom.hex(4)
+  [:pathname, :yard, :securerandom].each { |req| require req.to_s }
 
-  YARD::Rake::YardocTask.new(build) do |t|
-    t.files   = paths.map { |f| Pathname.new(f).join('**', '*.rb').to_s }
+  # internal task name
+  tname = 'doc:build:%s' % SecureRandom.hex(4)
+  # documented paths
+  paths = ['src/lib']
+
+  YARD::Rake::YardocTask.new(tname) do |t|
+    t.files = paths.map do |path|
+      Pathname.new(path).join('**', '*.rb').to_s
+    end
     t.options = ['-o', 'doc',
                  '--markup-provider=redcarpet',
                  '--markup=markdown']
   end
 
-  Rake::Task[build].invoke
+  Rake::Task[tname].invoke
 end
