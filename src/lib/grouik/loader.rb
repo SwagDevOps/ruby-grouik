@@ -9,8 +9,7 @@ class Grouik::Loader
   attr_reader   :errors
   attr_reader   :stats
 
-  def initialize(paths = [])
-    self.paths = paths.empty? ? ['.'] : paths
+  def initialize
     self.basedir = '.'
     self.ignores = []
 
@@ -21,10 +20,9 @@ class Grouik::Loader
     @attempts  = 0
     @stats     = nil
 
-    yield self if block_given?
-
-    @paths.reverse.each do |path|
-      $:.unshift basedir.realpath.join(path).to_s
+    if block_given?
+      yield self
+      register
     end
   end
 
@@ -34,6 +32,18 @@ class Grouik::Loader
 
   def paths=(paths)
     @paths = paths.map { |path| Pathname.new(path.to_s) }
+  end
+
+  def paths
+    (@paths || (@paths.empty? ? ['.'] : @paths)).clone
+  end
+
+  # Register paths
+  def register
+    @paths.reverse.each do |path|
+      $:.unshift basedir.realpath.join(path).to_s
+    end
+    self
   end
 
   def loadables

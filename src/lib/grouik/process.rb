@@ -1,10 +1,49 @@
 # frozen_string_literal: true
+require 'pathname'
 
 # Intended to wrap Grouik::Loader and easify reusability through Grouik::Cli
 # or as standalone (for example in a Rake task)
 class Grouik::Process
-  def initialize(paths)
+  attr_accessor :template
+  attr_accessor :output
+  attr_accessor :bootstrap
+  attr_accessor :verbose
+
+  def initialize
+    @output    = nil
+    @template  = nil
+    @bootstrap = nil
+    @verbose   = false
+
+    @loader = Grouik::Loader.new
     yield self if block_given?
+    @loader.register
+  end
+
+  def verbose?
+    !!(@verbose)
+  end
+
+  def output=(output)
+    @output = output.is_a?(String) ? Pathname.new(output) : output
+  end
+
+  def process
+    @output.write('') if @output.respond_to?(:file?)
+    if bootstrap
+      begin
+        require bootstrap if bootstrap
+      rescue NameError
+      rescue LoadError
+      end
+    end
+    display_errors
+    if verbose?
+      STDERR.write("\n") unless errors.empty?
+      display_status
+    end
+    output.write(loader.format(template: @template))
+    self
   end
 
   def format(options={})
@@ -42,7 +81,7 @@ class Grouik::Process
 
   # Provides access to public accessors
   def method_missing(method, *args, &block)
-    unless loader_accessors.include?(method.to_sym)
+    unless respond_to_missing?(method)
       message = 'undefined method `%s\' for %s' % [method, inspect]
       raise NoMethodError.new(message)
     end
@@ -51,7 +90,7 @@ class Grouik::Process
   end
 
   def respond_to_missing?(method, include_private = false)
-    self.respond_to?(method, include_private) ? true : super
+    loader_accessors.include?(method.to_sym)
   end
 
   protected

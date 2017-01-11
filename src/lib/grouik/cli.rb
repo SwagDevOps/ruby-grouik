@@ -89,32 +89,15 @@ class Grouik::Cli
       exit(Errno::EINVAL::Errno)
     end
 
-    gen = Grouik.get(:process).new(options.fetch(:paths)) do |instance|
-      instance.basedir = options.fetch(:basedir)
-      instance.ignores = options.fetch(:ignores)
-    end
-
-    if options.fetch(:output).respond_to?(:file?)
-      options[:output].write('')
-    end
-
-    begin
-      require options[:require] if options[:require]
-    rescue NameError
-    rescue LoadError
-    end
-
-    options
-      .fetch(:output)
-      .write(gen.format(template: options.fetch(:template)))
-
-    gen.display_errors
-    if options[:verbose]
-      STDERR.write("\n") unless gen.errors.empty?
-      gen.display_status
-    end
-
-    return gen.success? ? 0 : 1
+    return Grouik.process do |instance|
+      instance.basedir   = options.fetch(:basedir)
+      instance.paths     = options.fetch(:paths)
+      instance.ignores   = options.fetch(:ignores)
+      instance.output    = options.fetch(:output)
+      instance.template  = options[:template]
+      instance.bootstrap = options[:require]
+      instance.verbose   = !!(options[:verbose])
+    end.success? ? 0 : 1
   end
 
   def config

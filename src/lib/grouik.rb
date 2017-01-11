@@ -18,7 +18,7 @@ module Grouik
 
   # dependency injection
   @components = {
-    process: Process,
+    process_class: Process,
     formatter: Formatter,
     loadable_factory: -> (base, path) { Loadable.new(base, path) },
   }
@@ -28,6 +28,11 @@ module Grouik
 
     def get(name)
       components.fetch(name.to_sym)
+    end
+
+    # return [Grouik::Process]
+    def process(&block)
+      self.get(:process_class).new(&block).process
     end
   end
 end
