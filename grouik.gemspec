@@ -6,7 +6,6 @@ Gem::Specification.new do |s|
   s.version     = Grouik::VERSION
   s.summary     = 'Grouik!'
   s.description = 'A simple require file generator'
-  s.date        = '2016-12-23'
 
   s.licenses    = ['CC-BY-SA-4.0']
   s.authors     = ['Dimitri Arrigoni']
@@ -22,12 +21,15 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency "activesupport", ["~> 5.0"]
   s.add_runtime_dependency "tenjin", ["~> 0.7"]
+  s.add_runtime_dependency "rainbow", ["~> 2.2"]
   s.add_development_dependency "rake", ["~> 11.3"]
   s.add_development_dependency "cliver", ["= 0.3.2"]
   s.add_development_dependency "gemspec_deps_gen", ["= 1.1.2"]
   s.add_development_dependency "yard", ["~> 0.9"]
   s.add_development_dependency "redcarpet", ["~> 3.4"]
   s.add_development_dependency "github-markup", ["~> 1.4"]
+
+  s.date = '2017-01-01'
 end
 
 # Local Variables:

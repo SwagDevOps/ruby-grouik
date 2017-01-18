@@ -5,6 +5,7 @@ source 'https://rubygems.org'
 
 gem 'activesupport', '~> 5.0'
 gem 'tenjin', '~> 0.7'
+gem 'rainbow', '~> 2.2'
 
 group :development do
   gem 'rake', '~> 11.3'
