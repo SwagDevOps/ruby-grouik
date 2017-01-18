@@ -6,7 +6,6 @@ Gem::Specification.new do |s|
   s.version     = Grouik::VERSION
   s.summary     = 'Grouik!'
   s.description = 'A simple require file generator'
-  s.date        = '2016-12-23'
 
   s.licenses    = ['CC-BY-SA-4.0']
   s.authors     = ['Dimitri Arrigoni']
@@ -21,6 +20,7 @@ Gem::Specification.new do |s|
   end
 
   <%= project_dependencies %>
+  s.date = '<%= File.mtime('%s/src/lib/grouik/VERSION' % __dir__).strftime("%Y-%m-%d") %>'
 end
 
 # Local Variables:
