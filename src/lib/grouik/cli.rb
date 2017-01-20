@@ -95,7 +95,7 @@ class Grouik::Cli
     return Grouik.process do |instance|
       instance.basedir   = options.fetch(:basedir)
       instance.paths     = options.fetch(:paths)
-      instance.ignores   = options.fetch(:ignores)
+      instance.ignores   = options[:ignores]
       instance.output    = options.fetch(:output)
       instance.template  = options[:template]
       instance.bootstrap = options[:require]
