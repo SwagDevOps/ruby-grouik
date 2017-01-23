@@ -30,13 +30,14 @@ module Grouik
               .strip
 
   # loads sub(modules|classes)
-  [:loader, :loadable, :formatter, :process].each do |r|
+  [:loader, :loadable, :formatter, :process, :output].each do |r|
     require '%s/%s' % [ActiveSupport::Inflector.underscore(name), r]
   end
 
   @components = {
     process_class: Process,
     formatter: Formatter,
+    messager_factory: -> (&block) { Output::Message.new(&block) },
     loadable_factory: -> (base, path) { Loadable.new(base, path) },
   }
 
@@ -57,6 +58,11 @@ module Grouik
     # @return [Grouik::Process]
     def process(&block)
       self.get(:process_class).new(&block).process
+    end
+
+    def message(&block)
+      self.get(:messager_factory).call(&block).send
+      self
     end
   end
 end

@@ -61,17 +61,32 @@ class Grouik::Process
   end
 
   def display_status
-    message  = '%s: %s files; %s iterations; %s errors (%.4f)'
-    statuses = {true  => 'success', false => 'failure',}
+    message  = '%s: %s files; %s iterations; %s errors (%.4f) [%s]'
+    statuses = {true  => :success, false => :failure}
 
-    STDERR.puts((message % \
-                [
-                  statuses.fetch(loader.loaded?),
-                  loader.loadables.size,
-                  loader.attempts,
-                  errors.size,
-                  loader.stats ? loader.stats.real : 0
-                ]).capitalize)
+    outfile  = @output.to_s
+    $:.each do |path|
+      reg = /^#{Regexp.quote(path.to_s)}\//
+      if reg.match(outfile)
+        outfile.gsub!(reg, '').gsub!(/\.rb$/, '')
+        break
+      end
+    end
+
+    Grouik.message do |m|
+      m.stream  = STDERR
+      m.type    = 'status_%s' % statuses.fetch(loader.loaded?)
+      m.content = (message % \
+                   [
+                     statuses.fetch(loader.loaded?),
+                     loader.loadables.size,
+                     loader.attempts,
+                     errors.size,
+                     loader.stats ? loader.stats.real : 0,
+                     outfile
+                   ]).capitalize
+    end
+    self
   end
 
   def success?

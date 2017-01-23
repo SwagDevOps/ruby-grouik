@@ -26,19 +26,24 @@ class Grouik::Loader
     end
   end
 
-  def ignores
-    @ignores.map {|i| i = /\.rb$/.match(i) ? i : '%s.rb' % i}
+  # @param [Array<String>] ignores
+  def ignores=(ignores)
+    @ignores = ignores.to_a.map { |s| /#{s}/ }
   end
 
+  # @param [Array<String>] paths
   def paths=(paths)
-    @paths = paths.map { |path| Pathname.new(path.to_s) }
+    @paths = paths.to_a.map { |path| Pathname.new(path.to_s) }
   end
 
+  # @return [Array<Pathname>]
   def paths
     (@paths || (@paths.empty? ? ['.'] : @paths)).clone
   end
 
   # Register paths
+  #
+  # @return [self]
   def register
     @paths.reverse.each do |path|
       $:.unshift basedir.realpath.join(path).to_s
@@ -46,6 +51,9 @@ class Grouik::Loader
     self
   end
 
+  # Get loadables
+  #
+  # @return [Array<Grouik::Loadable>]
   def loadables
     return @loadables.clone unless @loadables.empty?
 
@@ -61,10 +69,24 @@ class Grouik::Loader
       end
     end
 
-    loadables.reject! do |loadable|
-      self.ignores.include?(loadable.path.to_s)
-    end
     (@loadables = loadables).clone
+  end
+
+  # Get filtered loadables, using ignores regexp
+  #
+  # @return [Array<Grouik::Loadable>]
+  def filtered
+    loadables = self.loadables.clone
+    filter = -> (loadable) do
+      ignores.each do |regex|
+        if loadable and regex.match(loadable.path(loadable: true).to_s)
+          return true
+        end
+      end
+      false
+    end
+
+    loadables.delete_if { |loadable| filter.call(loadable) }
   end
 
   def basedir
@@ -73,6 +95,7 @@ class Grouik::Loader
        Pathname.new(@basedir))
   end
 
+  # @return [self]
   def load_all
     return @loadeds.clone unless @loadeds.empty?
 
@@ -94,7 +117,7 @@ class Grouik::Loader
         end
         @loadeds.push(loadables.delete_at(index)) unless loaded.nil?
       end
-      return loadables
+      loadables
     end
 
     @stats = Benchmark.measure do
@@ -104,10 +127,15 @@ class Grouik::Loader
       end
     end
     @loadeds.compact
+    self
   end
 
+  # Format using a formatter
+  #
+  # @param [Hash] options
+  # @return [String]
   def format(options={})
-    Grouik.get(:formatter).format(load_all, options).to_s
+    Grouik.get(:formatter).format(load_all.filtered, options).to_s
   end
 
   def loaded?
