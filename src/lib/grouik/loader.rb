@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'benchmark'
+require 'pathname'
+
 class Grouik::Loader
   attr_accessor :basedir
   attr_accessor :ignores
