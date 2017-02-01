@@ -43,7 +43,7 @@ class Grouik::Output::Messager
     end
   end
 
-  # @param [Hash]
+  # @param type [Symbol|String]
   # @return [Rainbow::Presenter, Rainbow::NullPresenter]
   def format_as(type)
     colorize(self.class.formats[type.to_sym])
