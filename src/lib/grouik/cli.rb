@@ -3,7 +3,8 @@
 require 'optparse'
 require 'pathname'
 require 'yaml'
-require 'benchmark'
+
+require 'grouik' unless defined?(Grouik)
 
 class Grouik::Cli
   attr_reader :argv
@@ -40,14 +41,14 @@ class Grouik::Cli
   def initialize(argv = ARGV)
     @argv = argv.clone
     @options = self.class.defaults
-    @options = config unless config.empty?
+    # @options = config unless config.empty?
     @arguments = []
   end
 
   def parser
     options = @options
     parser = OptionParser.new do |opts|
-      opts.banner = 'Usage: %s [options]' % self.program_name
+      opts.banner = 'Usage: %s [options] [FILE]' % self.program_name
       opts.on('--basedir=BASEDIR', 'Basedir [%s]' % options[:basedir]) \
       {|v| options[:basedir] = v}
       opts.on('-o=OUTPUT', '--output=OUTPUT', 'Output [/dev/stdout]') do |v|
@@ -77,7 +78,7 @@ class Grouik::Cli
       exit(Errno::EINVAL::Errno)
     end
     @arguments = argv
-    @options = prepare_options(@options)
+    # @options = prepare_options(@options)
     self
   end
 
@@ -86,28 +87,32 @@ class Grouik::Cli
   # @return [Fixnum]
   def run
     parse!
-    if ARGV.empty? and config.empty?
-      STDERR.puts(parser)
-      STDERR.puts("\nCan not run without arguments and empty configuration.")
+    if argv.empty? and arguments.empty?
+      STDERR.puts("%s\nCan not run without arguments and options." % parser)
       return Errno::EINVAL::Errno
     end
 
-    return Grouik.process do |instance|
-      instance.basedir   = options.fetch(:basedir)
-      instance.paths     = options.fetch(:paths)
-      instance.ignores   = options[:ignores]
-      instance.output    = options.fetch(:output)
-      instance.template  = options[:template]
-      instance.bootstrap = options[:require]
-      instance.verbose   = !!(options[:verbose])
-    end.success? ? 0 : 1
+    return (process_options(options).success? ? 0 : 1) if argv.empty?
+
+    argv.each do |filepath|
+      options = self.options.merge(config_from_path(filepath))
+
+      Dir.chdir(Pathname.new(filepath).dirname) do
+        unless process_options(options).success?
+          return 1
+        end
+      end
+    end
+    0
   end
 
-  # Read default config file
+  # Read a config file
   #
-  # @return Hash
-  def config
-    file = Pathname.new(Dir.pwd).join('%s.yml' % self.program_name)
+  # @param [String] path
+  # @return [Hash]
+  def config_from_path(path)
+    file = Pathname.new(path.to_s)
+
     if file.exist? and file.file?
       h = YAML.load(file.read).inject({}){|h,(k,v)| h[k.intern] = v; h}
       h.each do |k, v|
@@ -120,6 +125,30 @@ class Grouik::Cli
 
   protected
 
+  # Initiate and run a new ``Process`` from options
+  #
+  # @param [Hash] options
+  # @return [Grouik::Process]
+  def process_options(options)
+    options = prepare_options(options)
+
+    Grouik.process do |instance|
+      instance.basedir   = options.fetch(:basedir)
+      instance.paths     = options.fetch(:paths)
+      instance.ignores   = options[:ignores]
+      instance.output    = options.fetch(:output)
+      instance.template  = options[:template]
+      instance.bootstrap = options[:require]
+      instance.verbose   = !!(options[:verbose])
+    end
+  end
+
+  # Prepare options
+  #
+  # Process values in order to easify their use
+  #
+  # @param [Hash] options
+  # @return [Hash]
   def prepare_options(options)
     [:require, :output].each do |k|
       next unless options[k]
