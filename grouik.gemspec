@@ -1,16 +1,19 @@
 # frozen_string_literal: true
+# vim: ai ts=2 sts=2 et sw=2 ft=ruby
+
 require '%s/src/lib/grouik' % __dir__
 
 Gem::Specification.new do |s|
   s.name        = File.basename(__FILE__).split('.')[0]
   s.version     = Grouik::VERSION
+  s.date        = Grouik::RELEASE_DATE
   s.summary     = 'Grouik!'
   s.description = 'A simple require file generator'
 
   s.licenses    = ['CC-BY-SA-4.0']
   s.authors     = ['Dimitri Arrigoni']
   s.email       = 'dimitri@arrigoni.me'
-  s.homepage    = '%s://github.com/%s/%s' % [:https, 'SwagDevOps', s.name]
+  s.homepage    = 'https://github.com/SwagDevOps/ruby-grouik'
 
   s.require_paths = ['src/lib']
   s.bindir        = 'src/bin'
@@ -28,8 +31,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency "yard", ["~> 0.9"]
   s.add_development_dependency "redcarpet", ["~> 3.4"]
   s.add_development_dependency "github-markup", ["~> 1.4"]
-
-  s.date = '2017-01-01'
 end
 
 # Local Variables:
