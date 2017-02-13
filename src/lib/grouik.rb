@@ -3,6 +3,7 @@
 require 'pathname'
 require 'pp'
 require 'active_support/inflector'
+
 $:.unshift Pathname.new(__dir__)
 
 # Produce a ``require`` file, resolving classes dependencies
@@ -23,11 +24,28 @@ $:.unshift Pathname.new(__dir__)
 #
 # or using command line.
 module Grouik
+  class << self
+    protected
+
+    # Get path to the ``VERSION`` file
+    #
+    # @return [Pathname]
+    def version_filepath
+      name = ActiveSupport::Inflector.underscore(self.name)
+
+      Pathname.new(__dir__).join(name, 'VERSION')
+    end
+  end
+
   # Version
-  VERSION = Pathname.new(__dir__)
-              .join(ActiveSupport::Inflector.underscore(name), 'VERSION')
-              .read
-              .strip
+  #
+  # @return [String]
+  VERSION = self.version_filepath.read.strip
+
+  # Release date
+  #
+  # @return [String]
+  RELEASE_DATE = File.mtime(self.version_filepath).strftime('%Y-%m-%d')
 
   # loads sub(modules|classes)
   [:loader, :loadable, :formatter, :process, :output].each do |r|
