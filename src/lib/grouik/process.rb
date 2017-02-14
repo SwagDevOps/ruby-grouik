@@ -40,10 +40,8 @@ class Grouik::Process
     output = loader.format(template: @template)
     display_errors
     @output.write(output)
-    if verbose?
-      STDERR.write("\n") unless errors.empty?
-      display_status
-    end
+    display_status if verbose?
+
     self
   end
 
@@ -56,8 +54,12 @@ class Grouik::Process
   end
 
   def display_errors
-    errors.each do |file, error|
-      STDERR.puts('%s: %s' % [file, error.message])
+    errors.each do |_index, struct|
+      STDERR.puts '%s[%s]: %s' % [
+                    struct.source,
+                    struct.line,
+                    struct.message,
+                  ]
     end
     self
   end

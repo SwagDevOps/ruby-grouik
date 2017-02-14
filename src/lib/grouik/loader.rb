@@ -2,6 +2,7 @@
 
 require 'benchmark'
 require 'pathname'
+require 'ostruct'
 
 class Grouik::Loader
   attr_accessor :basedir
@@ -115,10 +116,22 @@ class Grouik::Loader
         begin
           loaded = loadable.load(pwd.join(basedir))
         rescue Exception => e
-          @errors[loadable.path.to_s] = e unless @errors[loadable.path.to_s]
+          loadable_path = make_loadable_path(loadable)
+          unless @errors[loadable_path]
+            @errors[loadable_path] = OpenStruct.new(
+              source: loadable_path,
+              message: e.message.lines[0].strip.freeze,
+              line: e.backtrace[0].split(':')[1],
+              error: e
+            ).freeze
+          end
           next
         end
-        @loadeds.push(loadables.delete_at(index)) unless loaded.nil?
+        unless loaded.nil?
+          @loadeds.push(loadables.delete_at(index))
+          # when loadable is loaded, then error is removed
+          @errors.delete(make_loadable_path(loadable))
+        end
       end
       loadables
     end
@@ -147,7 +160,16 @@ class Grouik::Loader
 
   protected
 
+  # @return [Grouik::Loadable]
   def make_loadable(*args)
     Grouik.get(:loadable_factory).call(*args)
+  end
+
+  # Make a loadable path
+  #
+  # @param [Grouik::Loadable] loadable
+  # @return [String]
+  def make_loadable_path(loadable)
+    loadable.path(loadable: true).to_s.freeze
   end
 end
