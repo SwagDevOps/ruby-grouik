@@ -36,8 +36,10 @@ class Grouik::Process
       rescue LoadError
       end
     end
+
+    output = loader.format(template: @template)
     display_errors
-    @output.write(loader.format(template: @template))
+    @output.write(output)
     if verbose?
       STDERR.write("\n") unless errors.empty?
       display_status

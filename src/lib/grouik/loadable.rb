@@ -29,11 +29,8 @@ class Grouik::Loadable
 
   def load(from = nil)
     path = from ? Pathname.new(from).join(self.path) : self.path
-    begin
-      return require path
-    rescue NameError => e
-      return nil
-    end
+
+    return require path
   end
 
   def loadable?
