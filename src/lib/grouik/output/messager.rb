@@ -34,11 +34,15 @@ class Grouik::Output::Messager
       {
         status_success: {
           background: :green,
-          color: :black
+          color: :black,
         },
         status_failure: {
           background: :red,
-          color: :black},
+          color: :black,
+        },
+        error: {
+          color: :red,
+        }
       }
     end
   end
