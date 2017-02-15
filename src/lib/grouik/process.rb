@@ -6,6 +6,22 @@ require 'pathname'
 #
 # Easify reusability through ``Grouik::Cli``
 # or as standalone (for example in a Rake task)
+#
+# Sample of use:
+#
+# ~~~~
+# task 'src/ceres.rb' do
+#  require 'grouik'
+#
+#  Grouik.process do |grouik|
+#    grouik.verbose  = false
+#    grouik.paths    = ['lib']
+#    grouik.basedir  = 'src'
+#    grouik.output   = 'src/ceres.rb'
+#    grouik.template = 'src/ceres.tpl'
+#  end.on_errors { exit Errno::ECANCELED::Errno }
+# end
+# ~~~~
 class Grouik::Process
   attr_accessor :template
   attr_accessor :bootstrap
@@ -59,7 +75,7 @@ class Grouik::Process
   end
 
   def has_errors?
-    !errors.empty?
+    errors.empty? ? false : true
   end
 
   def display_errors
