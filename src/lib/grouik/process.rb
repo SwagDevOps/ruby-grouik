@@ -80,11 +80,15 @@ class Grouik::Process
 
   def display_errors
     errors.each do |_index, struct|
-      STDERR.puts '%s[%s]: %s' % [
-                    struct.source,
-                    struct.line,
-                    struct.message,
-                  ]
+      Grouik.message do |m|
+        m.stream  = STDERR
+        m.type    = 'error'
+        m.content = ('%s:%s: %s' % [
+                       struct.source,
+                       struct.line,
+                       struct.message,
+                     ])
+      end
     end
     self
   end
