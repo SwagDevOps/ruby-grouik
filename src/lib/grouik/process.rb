@@ -127,6 +127,8 @@ class Grouik::Process
     loader.loaded?
   end
 
+  # @yield [self] Block executed when errors have been encountered
+  # @return [self]
   def on_errors(&block)
     block.call(self) if has_errors?
 
