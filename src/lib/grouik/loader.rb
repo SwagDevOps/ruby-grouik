@@ -4,6 +4,8 @@ require 'benchmark'
 require 'pathname'
 require 'ostruct'
 
+require 'grouik/types'
+
 class Grouik::Loader
   attr_accessor :basedir
   attr_accessor :ignores
@@ -20,7 +22,7 @@ class Grouik::Loader
     @pwd       = Pathname.new(Dir.pwd)
     @loadeds   = []
     @errors    = {}
-    @loadables = []
+    @loadables = Grouik::Types::LoadablesCollection.new
     @attempts  = 0
     @stats     = nil
 
@@ -61,36 +63,22 @@ class Grouik::Loader
   def loadables
     return @loadables.clone unless @loadables.empty?
 
-    loadables = []
+    loadables = @loadables.clone
     self.basedir do
       @paths.each do |path|
-        base = path.to_s
+        loaddir = path.to_s
+        basereg = /^#{Regexp.quote(loaddir)}\//
+
         Dir.glob(path.join('**/*.rb'))
           .sort
-          .map { |file| file.gsub(/^#{Regexp.quote(base)}\//, '') }
+          .map { |file| file.gsub(basereg, '') }
           .map { |file| Pathname.new(file)}
-          .each { |file| loadables << make_loadable(base, file) }
+          .each { |file| loadables.add_file(file, loaddir) }
       end
     end
 
-    (@loadables = loadables).clone
-  end
-
-  # Get filtered loadables, using ignores regexp
-  #
-  # @return [Array<Grouik::Loadable>]
-  def filtered
-    loadables = self.loadables.clone
-    filter = -> (loadable) do
-      ignores.each do |regex|
-        if loadable and regex.match(loadable.path(loadable: true).to_s)
-          return true
-        end
-      end
-      false
-    end
-
-    loadables.delete_if { |loadable| filter.call(loadable) }
+    @loadables = loadables.filtered_by_regexps(ignores)
+    @loadables.clone
   end
 
   def basedir
@@ -151,7 +139,7 @@ class Grouik::Loader
   # @param [Hash] options
   # @return [String]
   def format(options={})
-    Grouik.get(:formatter).format(load_all.filtered, options).to_s
+    Grouik.get(:formatter).format(load_all.loadables, options).to_s
   end
 
   def loaded?
@@ -159,11 +147,6 @@ class Grouik::Loader
   end
 
   protected
-
-  # @return [Grouik::Loadable]
-  def make_loadable(*args)
-    Grouik.get(:loadable_factory).call(*args)
-  end
 
   # Make a loadable path
   #
