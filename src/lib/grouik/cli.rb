@@ -161,10 +161,16 @@ class Grouik::Cli
         options[k] = Pathname.new(Dir.pwd).join(options[k])
       end
     end
+
     [:ignores, :paths].each do |k|
       next unless options[k]
       options[k] = [options[k]] if options[k].is_a? String
+
+      if :ignores == k
+        options[k] = options[k].to_a.map { |s| /#{s}/ }
+      end
     end
+
     options
   end
 end
