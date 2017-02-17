@@ -41,7 +41,10 @@ class Grouik::Formatter
   protected
 
   def output
-    items = loadables.map { |i| 'require \'%s\'' % i.path(loadable: true) }
+    items = loadables
+              .to_a
+              .map { |i| 'require \'%s\'' % i.path(loadable: true) }
+
     return items.join("\n") + "\n" unless template
 
     context = {
