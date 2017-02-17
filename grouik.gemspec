@@ -18,9 +18,8 @@ Gem::Specification.new do |s|
   s.require_paths = ['src/lib']
   s.bindir        = 'src/bin'
   s.executables   = [s.name]
-  s.files         = Dir.glob('src/**/**').reject do |i|
-    /^.+\.gemspec\.erb$/.match(i)
-  end
+  s.files         = Dir.glob('src/**/**.rb') + \
+                    Dir.glob('src/**/VERSION')
 
   s.add_runtime_dependency "activesupport", ["~> 5.0"]
   s.add_runtime_dependency "tenjin", ["~> 0.7"]
