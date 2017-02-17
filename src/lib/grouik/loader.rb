@@ -32,9 +32,11 @@ class Grouik::Loader
     end
   end
 
-  # @param [Array<String>] ignores
+  # @param [Array<String|Regexp>] ignores
   def ignores=(ignores)
-    @ignores = ignores.to_a.map { |s| /#{s}/ }
+    @ignores = ignores.to_a.map do |s|
+      s.kind_of?(Regexp) ? s : /^#{s}$/
+    end
   end
 
   # @param [Array<String>] paths
