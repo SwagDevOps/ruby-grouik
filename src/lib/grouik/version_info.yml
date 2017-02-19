@@ -1,0 +1,11 @@
+---
+major: 0
+minor: 0
+patch: 1
+authors: ['Dimitri Arrigoni']
+email: 'dimitri@arrigoni.me'
+date: '2017-01-01'
+summary: 'Grouik!'
+description: 'A simple require file generator'
+licenses: ['CC-BY-SA-4.0']
+homepage: 'https://github.com/SwagDevOps/ruby-grouik'
