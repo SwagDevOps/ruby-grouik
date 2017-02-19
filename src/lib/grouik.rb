@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'pathname'
-require 'pp'
 require 'active_support/inflector'
 
 $:.unshift Pathname.new(__dir__)
@@ -11,14 +10,14 @@ $:.unshift Pathname.new(__dir__)
 # Sample of use:
 #
 # ~~~~
-# Grouik.process do |gr|
-#      gr.basedir   = './path/to/my/project'
-#      gr.paths     = ['lib']
-#      gr.ignores   = []
-#      gr.output    = '/dev/stdout'
-#      gr.template  = 'lib/main'
-#      gr.bootstrap = nil
-#      gr.verbose   = true
+# Grouik.process do |process|
+#      process.basedir   = './path/to/my/project'
+#      process.paths     = ['lib']
+#      process.ignores   = []
+#      process.output    = '/dev/stdout'
+#      process.template  = 'lib/main'
+#      process.bootstrap = nil
+#      process.verbose   = true
 # end.success? ? 0 : 1
 # ~~~~
 #

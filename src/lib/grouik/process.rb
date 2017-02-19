@@ -13,12 +13,12 @@ require 'pathname'
 # task 'src/ceres.rb' do
 #  require 'grouik'
 #
-#  Grouik.process do |grouik|
-#    grouik.verbose  = false
-#    grouik.paths    = ['lib']
-#    grouik.basedir  = 'src'
-#    grouik.output   = 'src/ceres.rb'
-#    grouik.template = 'src/ceres.tpl'
+#  Grouik.process do |process|
+#    process.verbose  = false
+#    process.paths    = ['lib']
+#    process.basedir  = 'src'
+#    process.output   = 'src/ceres.rb'
+#    process.template = 'src/ceres.tpl'
 #  end.on_errors { exit Errno::ECANCELED::Errno }
 # end
 # ~~~~

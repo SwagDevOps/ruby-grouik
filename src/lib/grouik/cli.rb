@@ -132,14 +132,14 @@ class Grouik::Cli
   def process_options(options)
     options = prepare_options(options)
 
-    Grouik.process do |instance|
-      instance.basedir   = options.fetch(:basedir)
-      instance.paths     = options.fetch(:paths)
-      instance.ignores   = options[:ignores]
-      instance.output    = options.fetch(:output)
-      instance.template  = options[:template]
-      instance.bootstrap = options[:require]
-      instance.verbose   = !!(options[:verbose])
+    Grouik.process do |process|
+      process.basedir   = options.fetch(:basedir)
+      process.paths     = options.fetch(:paths)
+      process.ignores   = options[:ignores]
+      process.output    = options.fetch(:output)
+      process.template  = options[:template]
+      process.bootstrap = options[:require]
+      process.verbose   = !!(options[:verbose])
     end
   end
 
