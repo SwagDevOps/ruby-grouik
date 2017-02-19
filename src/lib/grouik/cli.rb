@@ -6,16 +6,25 @@ require 'yaml'
 
 require 'grouik' unless defined?(Grouik)
 
+# Grouik command line interface
+#
+# Provides a ready to use program, based on ``Grouik`` library
 class Grouik::Cli
   attr_reader :argv
   attr_reader :options
   attr_reader :arguments
 
   class << self
+    # Program name
+    #
+    # @return [String]
     def program_name
       Pathname.new($0).basename('.rb').to_s
     end
 
+    # Run
+    #
+    # @param [Array] argv
     def run(argv = ARGV)
       self.new(argv).run
     end
@@ -34,10 +43,14 @@ class Grouik::Cli
     end
   end
 
+  # @return [String]
   def program_name
     self.class.program_name
   end
 
+  # Constructor
+  #
+  # @param [Array] argv
   def initialize(argv = ARGV)
     @argv = argv.clone
     @options = self.class.defaults
@@ -45,6 +58,9 @@ class Grouik::Cli
     @arguments = []
   end
 
+  # Provide an ``OptionParser``
+  #
+  # @return [OptionParser]
   def parser
     options = @options
     parser = OptionParser.new do |opts|
@@ -69,6 +85,11 @@ class Grouik::Cli
     parser
   end
 
+  # Parse command line options
+  #
+  # Abort process (error code SHOULD BE ``22``) on invalid option
+  #
+  # @return [self]
   def parse!
     argv = self.argv.clone
     begin
