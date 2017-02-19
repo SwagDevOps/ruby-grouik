@@ -19,7 +19,7 @@ require 'pathname'
 #    process.basedir  = 'src'
 #    process.output   = 'src/ceres.rb'
 #    process.template = 'src/ceres.tpl'
-#  end.on_errors { exit Errno::ECANCELED::Errno }
+#  end.on_failure { exit Errno::ECANCELED::Errno }
 # end
 # ~~~~
 class Grouik::Process
@@ -123,14 +123,32 @@ class Grouik::Process
     self
   end
 
+  # Denote process is a success
+  #
+  # @return [Boolean]
   def success?
-    loader.loaded?
+    loader.loaded? and !has_errors?
+  end
+
+  # Denote process is a failure
+  #
+  # @return [Boolean]
+  def failure?
+    !(success?)
   end
 
   # @yield [self] Block executed when errors have been encountered
   # @return [self]
-  def on_errors(&block)
-    block.call(self) if has_errors?
+  def on_failure(&block)
+    block.call(self) if failure?
+
+    self
+  end
+
+  # @yield [self] Block executed when process is a success
+  # @return [self]
+  def on_success(&block)
+    block.call(self) if success?
 
     self
   end
