@@ -59,8 +59,8 @@ class Grouik::Process
 
     output = loader.format(template: @template)
     display_errors
-    @output.write(output)
-    display_status if verbose?
+    # avoid to break previouly written file in case of failure
+    @output.write(output) if success?
 
     self
   end

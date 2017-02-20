@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'optparse'
+require 'ostruct'
 require 'pathname'
 require 'yaml'
 
@@ -32,6 +33,7 @@ class Grouik::Cli
     # default options
     def defaults
       {
+        stats: true,
         verbose: true,
         paths: ['.'],
         basedir: '.',
@@ -78,6 +80,8 @@ class Grouik::Cli
       {|v| options[:ignores] = v}
       opts.on('--paths x,y,z', Array, 'Paths') \
       {|v| options[:paths] = v}
+      opts.on('--[no-]stats', 'Display some stats') \
+      {|v| options[:stats] = v}
       opts.on('-v', '--[no-]verbose', 'Run verbosely') \
       {|v| options[:verbose] = v}
     end
@@ -103,25 +107,38 @@ class Grouik::Cli
     self
   end
 
+  # Get processable items (based on command arguments), used during execution
+  #
+  # @return [Array<OpenStruct>]
+  def processables
+    processables = []
+    if arguments.empty?
+      processables[0] = OpenStruct.new(
+        path: Pathname.new(Dir.pwd),
+        options: options,
+        'file?' => false,
+      )
+    else
+      arguments.each do |filepath|
+        processables << OpenStruct.new(
+          path: Pathname.new(filepath).dirname,
+          file: Pathname.new(filepath),
+          options: self.options.merge(config_from_path(filepath)),
+          'file?' => true,
+        )
+      end
+    end
+
+    processables.map(&:freeze)
+  end
+
   # Execute CLI and return exit code
   #
   # @return [Fixnum]
   def run
-    parse!
-    if argv.empty? and arguments.empty?
-      STDERR.puts("%s\nCan not run without arguments and options." % parser)
-      return Errno::EINVAL::Errno
-    end
-
-    return (process_options(options).success? ? 0 : 1) if argv.empty?
-
-    argv.each do |filepath|
-      options = self.options.merge(config_from_path(filepath))
-
-      Dir.chdir(Pathname.new(filepath).dirname) do
-        unless process_options(options).success?
-          return 1
-        end
+    parse!.processables.each do |processable|
+      Dir.chdir(processable.path) do
+        process(processable.options)
       end
     end
     0
@@ -150,10 +167,10 @@ class Grouik::Cli
   #
   # @param [Hash] options
   # @return [Grouik::Process]
-  def process_options(options)
+  def process(options)
     options = prepare_options(options)
 
-    Grouik.process do |process|
+    process = Grouik.process do |process|
       process.basedir   = options.fetch(:basedir)
       process.paths     = options.fetch(:paths)
       process.ignores   = options[:ignores]
@@ -162,6 +179,15 @@ class Grouik::Cli
       process.bootstrap = options[:require]
       process.verbose   = !!(options[:verbose])
     end
+
+    process.on_success do |process|
+      process.display_status if options[:stats]
+    end.on_failure do |process|
+      process.display_status if options[:stats]
+      exit Errno::ECANCELED::Errno
+    end
+
+    process
   end
 
   # Prepare options
