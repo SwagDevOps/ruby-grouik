@@ -13,6 +13,8 @@ class Project
     #
     # @return [Class]
     def subject
+      require '%s/src/lib/%s' % [Dir.pwd, Project.name]
+
       inflector.constantize(inflector.classify(name))
     end
 
