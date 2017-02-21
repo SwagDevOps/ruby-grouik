@@ -5,7 +5,6 @@ file "#{Project.name}.gemspec" =>
   require 'gemspec_deps_gen'
   require 'pathname'
   require 'tenjin'
-  require '%s/src/lib/%s' % [Dir.pwd, Project.name]
 
   files   = ["src/#{Project.name}.gemspec.tpl", "#{Project.name}.gemspec"]
   spec_id = Pathname.new(files[1])
