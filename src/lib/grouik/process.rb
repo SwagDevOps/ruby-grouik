@@ -42,13 +42,15 @@ class Grouik::Process
     !!(@verbose)
   end
 
-  # @return [Pathname]
+  # @param [Pathname|String] output
+  # @return [Object]
   def output=(output)
     @output = output.is_a?(String) ? Pathname.new(output) : output
   end
 
+  # @return [self]
   def process
-    @output.write('') if @output.respond_to?(:file?)
+    @output.write('') if @output.respond_to?(:file?) and !@output.exist?
     if bootstrap
       begin
         require bootstrap if bootstrap
@@ -65,6 +67,7 @@ class Grouik::Process
     self
   end
 
+  # @param [Hash] options
   def format(options={})
     loader.format(options)
   end
@@ -78,6 +81,9 @@ class Grouik::Process
     errors.empty? ? false : true
   end
 
+  # Display encountered errors
+  #
+  # @return [self]
   def display_errors
     errors.each do |_index, struct|
       Grouik.message do |m|
@@ -93,6 +99,8 @@ class Grouik::Process
     self
   end
 
+  # Display status
+  #
   # @return [self]
   def display_status
     message  = '%s: %s files; %s iterations; %s errors (%.4f) [%s]'
@@ -137,6 +145,8 @@ class Grouik::Process
     !(success?)
   end
 
+  # Block executed on failure
+  #
   # @yield [self] Block executed when errors have been encountered
   # @return [self]
   def on_failure(&block)
@@ -145,6 +155,8 @@ class Grouik::Process
     self
   end
 
+  # Block executed on success
+  #
   # @yield [self] Block executed when process is a success
   # @return [self]
   def on_success(&block)
@@ -169,11 +181,15 @@ class Grouik::Process
 
   protected
 
+  # Get loader
+  #
   # @return [Grouik::Loader]
   def loader
     @loader
   end
 
+  # Get loader public attributes
+  #
   # @return [Array]
   def loader_attributes
     loader.public_methods
@@ -181,6 +197,8 @@ class Grouik::Process
       .map {|m| m.to_s.gsub(/=$/, '').to_sym }
   end
 
+  # Get loader public accessors
+  #
   # @return [Array]
   def loader_accessors
     loader_attributes + loader_attributes.map { |m| ('%s=' % m).to_sym }
