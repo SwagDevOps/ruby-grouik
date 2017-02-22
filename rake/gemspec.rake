@@ -5,22 +5,28 @@ file "#{Project.name}.gemspec" =>
   require 'gemspec_deps_gen'
   require 'pathname'
   require 'tenjin'
+  require 'ostruct'
 
-  files   = ["src/#{Project.name}.gemspec.tpl", "#{Project.name}.gemspec"]
-  spec_id = Pathname.new(files[1])
+  tools = OpenStruct.new(
+    deps_gen: GemspecDepsGen.new,
+    template: Tenjin::Engine.new(cache: false),
+  )
+
+  files = OpenStruct.new(
+    templated: Pathname.new("src/#{Project.name}.gemspec.tpl"),
+    generated: Pathname.new(Dir.pwd).join("#{Project.name}.gemspec"),
+  )
+
+  spec_id = files.templated
               .read
               .scan(/Gem::Specification\.new\s+do\s+\|([a-z]+)\|/)
-              .fetch(0).fetch(0)
+              .flatten.fetch(0)
 
-  depsgen = GemspecDepsGen.new
   context = {
-    dependencies: depsgen.generate_project_dependencies(spec_id).strip,
+    dependencies: tools.deps_gen.generate_project_dependencies(spec_id).strip,
     name: Project.name,
   }.merge(Project.version_info)
 
-  output  = Tenjin::Engine
-              .new(cache: false)
-              .render(Pathname.new(Dir.pwd).join(files[0]).to_s, context)
-
-  Pathname.new(files[1]).write(output)
+  content = tools.template.render(files.templated.to_s, context)
+  files.generated.write(content)
 end
