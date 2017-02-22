@@ -2,10 +2,10 @@
 
 file "#{Project.name}.gemspec" =>
      ["src/#{Project.name}.gemspec.tpl", 'Gemfile'] do
-  require 'gemspec_deps_gen'
-  require 'pathname'
-  require 'tenjin'
   require 'ostruct'
+  require 'pathname'
+  require 'gemspec_deps_gen'
+  require 'tenjin'
 
   tools = OpenStruct.new(
     deps_gen: GemspecDepsGen.new,
