@@ -23,9 +23,12 @@ require 'pathname'
 # end
 # ~~~~
 class Grouik::Process
+  require 'grouik/process/helper'
+
   attr_accessor :template
   attr_accessor :bootstrap
   attr_accessor :verbose
+  attr_reader   :output
 
   def initialize
     @output    = nil
@@ -59,7 +62,7 @@ class Grouik::Process
       end
     end
 
-    output = loader.format(template: @template)
+    output = @loader.format(template: @template)
     display_errors
     # avoid to break previouly written file in case of failure
     @output.write(output) if success?
@@ -69,7 +72,7 @@ class Grouik::Process
 
   # @param [Hash] options
   def format(options={})
-    loader.format(options)
+    @loader.format(options)
   end
 
   # @return [Hash]
@@ -85,17 +88,8 @@ class Grouik::Process
   #
   # @return [self]
   def display_errors
-    errors.each do |_index, struct|
-      Grouik.message do |m|
-        m.stream  = STDERR
-        m.type    = 'error'
-        m.content = ('%s:%s: %s' % [
-                       struct.source,
-                       struct.line,
-                       struct.message,
-                     ])
-      end
-    end
+    helper.display_errors
+
     self
   end
 
@@ -103,31 +97,8 @@ class Grouik::Process
   #
   # @return [self]
   def display_status
-    message  = '%s: %s files; %s iterations; %s errors (%.4f) [%s]'
-    statuses = {true  => :success, false => :failure}
+    helper.display_status
 
-    outfile  = @output.to_s
-    $:.each do |path|
-      reg = /^#{Regexp.quote(path.to_s)}\//
-      if reg.match(outfile)
-        outfile.gsub!(reg, '').gsub!(/\.rb$/, '')
-        break
-      end
-    end
-
-    Grouik.message do |m|
-      m.stream  = STDERR
-      m.type    = 'status_%s' % statuses.fetch(loader.loaded?)
-      m.content = (message % \
-                   [
-                     statuses.fetch(loader.loaded?),
-                     loader.loadables.size,
-                     loader.attempts,
-                     errors.size,
-                     loader.stats ? loader.stats.real : 0,
-                     outfile
-                   ]).capitalize
-    end
     self
   end
 
@@ -179,14 +150,14 @@ class Grouik::Process
     loader_accessors.include?(method.to_sym)
   end
 
-  protected
-
   # Get loader
   #
   # @return [Grouik::Loader]
   def loader
-    @loader
+    @loader.clone.freeze
   end
+
+  protected
 
   # Get loader public attributes
   #
@@ -202,5 +173,9 @@ class Grouik::Process
   # @return [Array]
   def loader_accessors
     loader_attributes + loader_attributes.map { |m| ('%s=' % m).to_sym }
+  end
+
+  def helper
+    Helper.new(self)
   end
 end
