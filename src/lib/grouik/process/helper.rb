@@ -43,7 +43,7 @@ class Grouik::Process::Helper
                      loader.attempts,
                      loader.errors.size,
                      loader.stats ? loader.stats.real : 0,
-                     format_filepath(outfile)
+                     format_filepath(process.output)
                    ])
     end
     self
@@ -73,7 +73,7 @@ class Grouik::Process::Helper
 
     $:.each do |path|
       reg = /^#{Regexp.quote(path.to_s)}\//
-      if reg.match(outfile)
+      if reg.match(filepath)
         filepath.gsub!(reg, '').gsub!(/\.rb$/, '')
         break
       end
