@@ -8,7 +8,7 @@ task :gem => ['gem:gemspec', 'gem:package']
 
 namespace :gem do
   # desc Rake::Task[:gem].comment
-  task :package => ['gem:gemspec'] do
+  task :package => ['gem:gemspec'] + Dir.glob('src/**/*.rb') do
     require 'rubygems/package_task'
 
     # internal namespace name
