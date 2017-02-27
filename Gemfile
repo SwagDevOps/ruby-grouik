@@ -11,6 +11,7 @@ gem 'version_info', '~> 1.9'
 group :development do
   gem 'rake', '~> 11.3'
   gem 'cliver', '= 0.3.2'
+  gem 'rubocop', '~> 0.47'
   gem 'gemspec_deps_gen', '= 1.1.2'
   # Github Flavored Markdown in YARD
   gem 'yard', '~> 0.9'

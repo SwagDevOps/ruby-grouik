@@ -39,4 +39,4 @@ class Project
   end
 end
 
-Dir.glob('rake/**.rake').each {|f| load(f)}
+Dir.glob('rake/**/*.rake').each {|f| load(f)}

@@ -1,0 +1,18 @@
+# see:
+# https://github.com/bbatsov/rubocop/tree/master/config
+# https://raw.githubusercontent.com/bbatsov/rubocop/master/config/enabled.yml
+#
+# cat .rubocop.yml | egrep '^[A-Z].*/' | sort -u
+
+Lint/UnusedBlockArgument: { Enabled: false }
+Style/AndOr: { Enabled: false }
+Style/ClassAndModuleChildren: { Enabled: false }
+Style/Encoding: { Enabled: false }
+Style/FormatString: { Enabled: false }
+Style/MultilineBlockChain: { Enabled: false }
+Style/RedundantReturn: { Enabled: false }
+Style/RedundantSelf: { Enabled: false }
+Style/Send: { Enabled: true }
+
+AllCops:
+  DisplayCopNames: true
