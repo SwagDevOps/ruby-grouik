@@ -3,5 +3,6 @@ require 'rake/clean'
 
 [
   'pkg',
+  'doc',
   "#{Project.name}.gemspec",
 ].each { |c| CLOBBER.include(c) }
