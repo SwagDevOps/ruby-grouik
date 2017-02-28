@@ -11,7 +11,7 @@ class Grouik::Types::LoadablesCollection < Array
   def filtered_by_regexps(regexps)
     filter = -> (loadable) do
       regexps.each do |regexp|
-        if loadable and regexp.match(loadable.path(loadable: true).to_s)
+        if loadable and regexp.match(loadable.to_s)
           return true
         end
       end

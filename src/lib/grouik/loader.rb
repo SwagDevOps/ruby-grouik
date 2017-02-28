@@ -106,10 +106,9 @@ class Grouik::Loader
         begin
           loaded = loadable.load(pwd.join(basedir))
         rescue Exception => e
-          loadable_path = make_loadable_path(loadable)
-          unless @errors[loadable_path]
-            @errors[loadable_path] = OpenStruct.new(
-              source: loadable_path,
+          unless @errors[loadable.to_s]
+            @errors[loadable.to_s] = OpenStruct.new(
+              source: loadable.to_s,
               message: e.message.lines[0].strip.freeze,
               line: e.backtrace[0].split(':')[1],
               error: e
@@ -120,7 +119,7 @@ class Grouik::Loader
         unless loaded.nil?
           @loadeds.push(loadables.delete_at(index))
           # when loadable is loaded, then error is removed
-          @errors.delete(make_loadable_path(loadable))
+          @errors.delete(loadable.to_s)
         end
       end
       loadables
@@ -146,15 +145,5 @@ class Grouik::Loader
 
   def loaded?
     self.loadables.size == @loadeds.size
-  end
-
-  protected
-
-  # Make a loadable path
-  #
-  # @param [Grouik::Loadable] loadable
-  # @return [String]
-  def make_loadable_path(loadable)
-    loadable.path(loadable: true).to_s.freeze
   end
 end
