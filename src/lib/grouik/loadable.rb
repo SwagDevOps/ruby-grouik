@@ -26,6 +26,11 @@ class Grouik::Loadable
     }[(format and loadable?)].gsub(/\.rb$/, '')
   end
 
+  # @return [String]
+  def to_s
+    path(true)
+  end
+
   # @return [Boolean]
   def load(from = nil)
     path = from ? Pathname.new(from).join(self.path) : self.path
