@@ -1,32 +1,32 @@
 require 'pathname'
 
+# Describe a loable item (Ruby file)
 class Grouik::Loadable
   attr_reader :base
   attr_reader :path
   attr_reader :basedir
 
+  # @param [String] base
+  # @param [String] path
+  # @param [String] basedir
   def initialize(base, path, basedir = '.')
     @base = Pathname.new(base)
     @path = path
     @basedir = Pathname.new(basedir).realpath
   end
 
-  def path(options={})
-    options[:absolute] = options[:absolute].nil? ? true : options[:absolute]
-    options[:stripped] = options[:stripped].nil? ? true : options[:stripped]
-    options[:loadable] = options[:loadable].nil? ? false : options[:loadable]
+  # @param [Boolean] format format as loadable from ``$LOAD_PATH``
+  # @return [String]
+  def path(format = false)
+    path = @path.to_s
 
-    path = @path.clone
-    path = options[:absolute] ? basedir.join(base, path) : path
-    path = options[:stripped] ? Pathname.new(path.to_s.gsub(/\.rb$/, '')) : path
-
-    if options[:loadable]
-      return @path.to_s.gsub(/\.rb$/, '') if loadable?
-    end
-
-    return path
+    {
+      true  => path,
+      false => basedir.join(base, path).to_s
+    }[(format and loadable?)].gsub(/\.rb$/, '')
   end
 
+  # @return [Boolean]
   def load(from = nil)
     path = from ? Pathname.new(from).join(self.path) : self.path
 
@@ -38,8 +38,9 @@ class Grouik::Loadable
   end
 
   class << self
+    # @return [Array<String>]
     def paths
-      $:.map { |path| path.to_s }
+      $LOAD_PATH.map(&:to_s)
     end
   end
 end
