@@ -4,7 +4,7 @@ require 'pathname'
 require 'active_support/inflector'
 require 'version_info'
 
-$:.unshift Pathname.new(__dir__)
+$LOAD_PATH.unshift Pathname.new(__dir__)
 
 # Produce a ``require`` file, resolving classes dependencies
 #
@@ -60,8 +60,8 @@ module Grouik
   @components = {
     process_class: Process,
     formatter: Formatter,
-    messager_factory: -> (&block) { Output::Message.new(&block) },
-    loadable_factory: -> (base, path) { Loadable.new(base, path) },
+    messager_factory: ->(&block) { Output::Message.new(&block) },
+    loadable_factory: ->(base, path) { Loadable.new(base, path) },
   }
 
   class << self
