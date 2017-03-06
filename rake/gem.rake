@@ -20,7 +20,7 @@ namespace :gem do
       begin
         Rake::Task['%s:package' % ns].invoke
       rescue Gem::InvalidSpecificationException => e
-        puts e
+        STDERR.puts(e)
         exit 1
       end
       Rake::Task['clobber'].reenable
