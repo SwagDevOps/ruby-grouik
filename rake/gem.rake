@@ -17,7 +17,12 @@ namespace :gem do
       task = Gem::PackageTask.new(Project.spec)
       task.define
       # Task management
-      Rake::Task['%s:package' % ns].invoke
+      begin
+        Rake::Task['%s:package' % ns].invoke
+      rescue Gem::InvalidSpecificationException => e
+        puts e
+        exit 1
+      end
       Rake::Task['clobber'].reenable
     end
   end
