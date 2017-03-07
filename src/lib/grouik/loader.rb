@@ -4,39 +4,41 @@ require 'benchmark'
 require 'pathname'
 require 'ostruct'
 
-require 'grouik/types'
+require 'grouik/concerns'
 
+# Main class loader
+#
+# loads files during ``Grouik::Loader#load_all``
 class Grouik::Loader
   attr_accessor :basedir
   attr_accessor :ignores
   attr_reader   :paths
-  attr_reader   :pwd
+
   attr_reader   :attempts
   attr_reader   :errors
   attr_reader   :stats
+
+  include Grouik::Concerns::Helpable
 
   def initialize
     self.basedir = '.'
     self.ignores = []
 
-    @pwd       = Pathname.new(Dir.pwd)
     @loadeds   = []
     @errors    = {}
-    @loadables = Grouik::Types::LoadablesCollection.new
+    @loadables = []
     @attempts  = 0
     @stats     = nil
 
-    if block_given?
-      yield self
-      register
-    end
+    return self unless block_given?
+
+    yield self
+    register
   end
 
   # @param [Array<String|Regexp>] ignores
   def ignores=(ignores)
-    @ignores = ignores.to_a.map do |s|
-      s.kind_of?(Regexp) ? s : /^#{s}$/
-    end
+    @ignores = helpers.get(:loader).make_ignores(ignores)
   end
 
   # @param [Array<String>] paths
@@ -53,9 +55,8 @@ class Grouik::Loader
   #
   # @return [self]
   def register
-    @paths.reverse.each do |path|
-      $:.unshift basedir.realpath.join(path).to_s
-    end
+    helpers.get(:loader).register_paths(basedir, @paths)
+
     self
   end
 
@@ -63,30 +64,22 @@ class Grouik::Loader
   #
   # @return [Array<Grouik::Loadable>]
   def loadables
-    return @loadables.clone unless @loadables.empty?
-
-    loadables = @loadables.clone
-    self.basedir do
-      @paths.each do |path|
-        loaddir = path.to_s
-        basereg = /^#{Regexp.quote(loaddir)}\//
-
-        Dir.glob(path.join('**/*.rb'))
-          .sort
-          .map { |file| file.gsub(basereg, '') }
-          .map { |file| Pathname.new(file)}
-          .each { |file| loadables.add_file(file, loaddir) }
+    if @loadables.empty?
+      self.basedir do
+        @loadables = helpers.get(:loader)
+                            .collect_loadables(paths)
+                            .ignores(ignores)
       end
     end
 
-    @loadables = loadables.filtered_by_regexps(ignores)
     @loadables.clone
   end
 
+  # @return [Pathname]
   def basedir
-    (block_given? ?
-       Dir.chdir(pwd.join(basedir)) { yield } :
-       Pathname.new(@basedir))
+    Dir.chdir(helpers.get(:loader).pwd.join(basedir)) { yield } if block_given?
+
+    Pathname.new(@basedir)
   end
 
   # @return [self]
@@ -97,37 +90,9 @@ class Grouik::Loader
     @loadeds  = []
     @errors   = {}
 
-    process_loadables = lambda do |loadables|
-      loadables.each_with_index do |loadable, index|
-        max = (self.loadables.size ** 2) + 1
-        return nil if attempts >= max or loadables.empty?
-        @attempts += 1
-        loaded = nil
-        begin
-          loaded = loadable.load(pwd.join(basedir))
-        rescue Exception => e
-          unless @errors[loadable.to_s]
-            @errors[loadable.to_s] = OpenStruct.new(
-              source: loadable.to_s,
-              message: e.message.lines[0].strip.freeze,
-              line: e.backtrace[0].split(':')[1],
-              error: e
-            ).freeze
-          end
-          next
-        end
-        unless loaded.nil?
-          @loadeds.push(loadables.delete_at(index))
-          # when loadable is loaded, then error is removed
-          @errors.delete(loadable.to_s)
-        end
-      end
-      loadables
-    end
-
     @stats = Benchmark.measure do
-      while(true)
-        loadables = process_loadables.call(loadables)
+      loop do
+        loadables = process_loadables(loadables)
         break if loadables.nil? or (loadables and loadables.empty?)
       end
     end
@@ -139,11 +104,47 @@ class Grouik::Loader
   #
   # @param [Hash] options
   # @return [String]
-  def format(options={})
+  def format(options = {})
     Grouik.get(:formatter).format(load_all.loadables, options).to_s
   end
 
   def loaded?
     self.loadables.size == @loadeds.size
+  end
+
+  # @return [Fixnum]
+  def attempts_maxcount
+    (self.loadables.size**2) + 1
+  end
+
+  protected
+
+  def process_loadables(processables)
+    processables.each_with_index do |loadable, index|
+      return [] if attempts >= attempts_maxcount or processables.empty?
+
+      @attempts += 1
+      loaded = nil
+      begin
+        loaded = loadable.load(helpers.get(:loader).pwd.join(basedir))
+      rescue StandardError => e
+        unless @errors[loadable.to_s]
+          @errors[loadable.to_s] = OpenStruct.new(
+            source: loadable.to_s,
+            message: e.message.lines[0].strip.freeze,
+            line: e.backtrace[0].split(':')[1],
+            error: e
+          ).freeze
+        end
+        next
+      end
+
+      next if loaded.nil?
+
+      @loadeds.push(processables.delete_at(index))
+      # when loadable is loaded, then error is removed
+      @errors.delete(loadable.to_s)
+    end
+    processables
   end
 end
