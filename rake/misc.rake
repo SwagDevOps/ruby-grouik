@@ -1,16 +1,18 @@
-desc 'Reformat .gitignore file'
-task '.gitignore' do
-  require 'pathname'
+# frozen_string_literal: true
 
-  file = Pathname.new('.gitignore')
+require 'pathname'
 
-  if file.exist?
+if Pathname.new('.gitignore').exist?
+  desc 'Reformat .gitignore file'
+  task '.gitignore' do
+
+    file = Pathname.new('.gitignore')
     content = file.read.lines
-                .sort_by { |m| m.downcase }
-                .map { |m| m.rstrip }
-                .reject(&:empty?)
-                .reject { |m| m[0] == '#' }
-                .join("\n")
+                  .sort_by { |m| m.downcase }
+                  .map { |m| m.rstrip }
+                  .reject(&:empty?)
+                  .reject { |m| m[0] == '#' }
+                  .join("\n")
 
     file.write(content)
   end
