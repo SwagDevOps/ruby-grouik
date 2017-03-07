@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
 require 'pathname'
 require 'tenjin'
 
+# Formatter used to render loadables
 class Grouik::Formatter
   attr_reader :options
   attr_reader :loadables
@@ -11,11 +14,12 @@ class Grouik::Formatter
     @options   = options
     @formatted = nil
     @engine    = Tenjin::Engine.new(cache: false)
-    @template  = nil
+    @template  = options[:template]
+  end
 
-    if options[:template]
-      @template = Pathname.new(options[:template]).realpath
-    end
+  # @return [Pathname|nil]
+  def template
+    @template ? Pathname.new(template).realpath : nil
   end
 
   def to_s
@@ -24,6 +28,7 @@ class Grouik::Formatter
 
   def format
     @formatted = @formatted.nil? ? output : @formatted
+
     return self
   end
 
@@ -33,7 +38,7 @@ class Grouik::Formatter
   end
 
   class << self
-    def format(loadables, options={})
+    def format(loadables, options = {})
       self.new(loadables, options).format
     end
   end
@@ -46,8 +51,8 @@ class Grouik::Formatter
     return items.join("\n") + "\n" unless template
 
     context = {
-      requirement: -> (indent=nil) do
-        items.map { |i| '%s%s' % [indent, i]}.join("\n")
+      requirement: lambda do |indent = nil|
+        items.map { |i| '%s%s' % [indent, i] }.join("\n")
       end
     }
 
