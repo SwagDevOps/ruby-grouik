@@ -19,7 +19,7 @@ class Grouik::Formatter
 
   # @return [Pathname|nil]
   def template
-    @template ? Pathname.new(template).realpath : nil
+    @template ? Pathname.new(@template).realpath : nil
   end
 
   def to_s
