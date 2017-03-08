@@ -42,7 +42,7 @@ class Grouik::Process
   end
 
   def verbose?
-    !!(@verbose)
+    !!@verbose
   end
 
   # @param [Pathname|String] output
@@ -71,16 +71,21 @@ class Grouik::Process
   end
 
   # @param [Hash] options
-  def format(options={})
+  def format(options = {})
     @loader.format(options)
   end
 
+  # Errors encountered during process
+  #
   # @return [Hash]
   def errors
     loader.errors
   end
 
-  def has_errors?
+  # Denote errors encountered
+  #
+  # @return [Boolean]
+  def errors?
     errors.empty? ? false : true
   end
 
@@ -106,22 +111,22 @@ class Grouik::Process
   #
   # @return [Boolean]
   def success?
-    loader.loaded? and !has_errors?
+    loader.loaded? and !errors?
   end
 
   # Denote process is a failure
   #
   # @return [Boolean]
   def failure?
-    !(success?)
+    !success?
   end
 
   # Block executed on failure
   #
   # @yield [self] Block executed when errors have been encountered
   # @return [self]
-  def on_failure(&block)
-    block.call(self) if failure?
+  def on_failure
+    yield(self) if failure?
 
     self
   end
@@ -130,24 +135,28 @@ class Grouik::Process
   #
   # @yield [self] Block executed when process is a success
   # @return [self]
-  def on_success(&block)
-    block.call(self) if success?
+  def on_success
+    yield(self) if success?
 
     self
   end
 
   # Provides access to public accessors
   def method_missing(method, *args, &block)
-    unless respond_to_missing?(method)
-      message = 'undefined method `%s\' for %s' % [method, inspect]
-      raise NoMethodError.new(message)
+    if respond_to_missing?(method)
+      @loader.public_send(method, *args, &block)
+    else
+      super
     end
-
-    @loader.public_send(method, *args, &block)
   end
 
   def respond_to_missing?(method, include_private = false)
-    loader_accessors.include?(method.to_sym)
+    result = loader_accessors.include?(method.to_sym)
+    unless result
+      return super if include_private
+    end
+
+    result
   end
 
   # Get loader
@@ -164,8 +173,8 @@ class Grouik::Process
   # @return [Array]
   def loader_attributes
     loader.public_methods
-      .grep(/^\w+=$/)
-      .map {|m| m.to_s.gsub(/=$/, '').to_sym }
+          .grep(/^\w+=$/)
+          .map { |m| m.to_s.gsub(/=$/, '').to_sym }
   end
 
   # Get loader public accessors
