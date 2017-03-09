@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Describe a message (sent on a IO as STDOUT/STDERR)
 class Grouik::Output::Message
   attr_accessor :content
   attr_accessor :type
@@ -29,9 +30,7 @@ class Grouik::Output::Message
   def send
     attrs = [:stream, :content, :type]
     attrs.each do |attr|
-      if public_send(attr).nil?
-        raise ::RuntimeError.new('attributes %s must be set' % attrs)
-      end
+      raise 'attributes %s must be set' % attrs if public_send(attr).nil?
     end
 
     messager_class.new(stream, content.to_s).output(type)
@@ -43,6 +42,7 @@ class Grouik::Output::Message
   # @return [Grouik::Output::Messager]
   def messager_class
     require '%s/messager' % __dir__
+
     Grouik::Output::Messager
   end
 end
