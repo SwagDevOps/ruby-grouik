@@ -20,7 +20,7 @@ class Grouik::Cli
     #
     # @return [String]
     def program_name
-      Pathname.new($0).basename('.rb').to_s
+      Pathname.new($PROGRAM_NAME).basename('.rb').to_s
     end
 
     # Run
@@ -68,7 +68,7 @@ class Grouik::Cli
     parser = OptionParser.new do |opts|
       opts.banner = 'Usage: %s [options] [FILE]' % self.program_name
       opts.on('--basedir=BASEDIR', 'Basedir [%s]' % options[:basedir]) \
-      {|v| options[:basedir] = v}
+      { |v| options[:basedir] = v }
       opts.on('-o=OUTPUT', '--output=OUTPUT', 'Output [/dev/stdout]') do |v|
         options[:output] = v
       end
@@ -77,13 +77,13 @@ class Grouik::Cli
       end
 
       opts.on('--ignores x,y,z', Array, 'Ignores') \
-      {|v| options[:ignores] = v}
+      { |v| options[:ignores] = v }
       opts.on('--paths x,y,z', Array, 'Paths') \
-      {|v| options[:paths] = v}
+      { |v| options[:paths] = v }
       opts.on('--[no-]stats', 'Display some stats') \
-      {|v| options[:stats] = v}
+      { |v| options[:stats] = v }
       opts.on('-v', '--[no-]verbose', 'Run verbosely') \
-      {|v| options[:verbose] = v}
+      { |v| options[:verbose] = v }
     end
 
     parser
@@ -116,7 +116,7 @@ class Grouik::Cli
       processables[0] = OpenStruct.new(
         path: Pathname.new(Dir.pwd),
         options: options,
-        'file?' => false,
+        'file?' => false
       )
     else
       arguments.each do |filepath|
@@ -124,7 +124,7 @@ class Grouik::Cli
           path: Pathname.new(filepath).dirname,
           file: Pathname.new(filepath),
           options: self.options.merge(config_from_path(filepath)),
-          'file?' => true,
+          'file?' => true
         )
       end
     end
@@ -152,9 +152,8 @@ class Grouik::Cli
     file = Pathname.new(path.to_s)
 
     if file.exist? and file.file?
-      h = YAML.load(file.read).inject({}){|h,(k,v)| h[k.intern] = v; h}
+      h = YAML.safe_load(file.read).each_with_object({}) { |(k, v), h| h[k.intern] = v; }
       h.each do |k, v|
-
       end
       return h
     end
@@ -213,9 +212,7 @@ class Grouik::Cli
       next unless options[k]
       options[k] = [options[k]] if options[k].is_a? String
 
-      if :ignores == k
-        options[k] = options[k].to_a.map { |s| /#{s}/ }
-      end
+      options[k] = options[k].to_a.map { |s| /#{s}/ } if :ignores == k
     end
 
     options
