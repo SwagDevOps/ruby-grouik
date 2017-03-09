@@ -13,15 +13,32 @@ module Grouik::Helpers
     # @param [String|Symbol] target
     # @return [Object]
     def get(target)
-      inflector = ActiveSupport::Inflector
-      class_name = [
-        name,
-        inflector.classify(target.to_s.gsub('/', '::'))
-      ].join('::')
+      class_name = self.classify(target)
 
-      require '%s/%s' % [__FILE__.gsub(/\.rb$/, ''), target]
+      require load_dir.join(target.to_s) unless const_defined?(class_name)
 
       inflector.constantize(class_name)
+    end
+
+    # Directory where helpers stand
+    #
+    # @return [Pathname]
+    def load_dir
+      Pathname.new(__FILE__.gsub(/\.rb$/, ''))
+    end
+
+    protected
+
+    # @return ActiveSupport::Inflector
+    def inflector
+      ActiveSupport::Inflector
+    end
+
+    # Transform string
+    #
+    # return [String]
+    def classify(target)
+      '%s::%s' % [name, inflector.classify(target.to_s.gsub('/', '::'))]
     end
   end
 end
