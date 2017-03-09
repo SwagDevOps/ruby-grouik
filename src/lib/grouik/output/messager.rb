@@ -18,12 +18,13 @@ class Grouik::Output::Messager
   # @return [self]
   def output(type)
     stream.puts self.format_as(type)
+
     self
   end
 
   class << self
     # @return [self]
-    def output(stream, type, message)
+    def output(stream, type)
       self.new(stream, content).output(type)
     end
 
@@ -60,12 +61,14 @@ class Grouik::Output::Messager
 
   protected
 
+  # Get a colorizable (almost a wrapper over ``Rainbow``) content instance
+  #
   # @return [Rainbow::Presenter, Rainbow::NullPresenter]
   def colorizable
     require 'rainbow'
 
     Rainbow.enabled = colorizable?
-    return Rainbow::Wrapper.new(colorizable?).wrap(content)
+    Rainbow::Wrapper.new(colorizable?).wrap(content)
   end
 
   def colorize(format = {})
