@@ -18,10 +18,10 @@ class Grouik::Process::Helper
         m.stream  = STDERR
         m.type    = 'error'
         m.content = ('%s:%s: %s' % [
-                       struct.source,
-                       struct.line,
-                       struct.message,
-                     ])
+          struct.source,
+          struct.line,
+          struct.message,
+        ])
       end
     end
   end
@@ -53,7 +53,7 @@ class Grouik::Process::Helper
   #
   # @return [Symbol]
   def process_status
-    statuses = {true  => :success, false => :failure}
+    statuses = { true => :success, false => :failure }
 
     statuses.fetch(process.success?)
   end
@@ -61,9 +61,7 @@ class Grouik::Process::Helper
   protected
 
   # @return [Grouik::Process]
-  def process
-    @process
-  end
+  attr_reader :process
 
   # Format a filepath with a ``require`` format
   #
@@ -71,7 +69,7 @@ class Grouik::Process::Helper
   def format_filepath(filepath)
     filepath = filepath.to_s
 
-    $:.each do |path|
+    $LOAD_PATH.each do |path|
       reg = /^#{Regexp.quote(path.to_s)}\//
       if reg.match(filepath)
         filepath.gsub!(reg, '').gsub!(/\.rb$/, '')
