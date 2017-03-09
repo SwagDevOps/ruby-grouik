@@ -52,6 +52,7 @@ class Grouik::Process
   end
 
   # @return [self]
+  # @todo Do not suppress exceptions
   def process
     @output.write('') if @output.respond_to?(:file?) and !@output.exist?
     if bootstrap
