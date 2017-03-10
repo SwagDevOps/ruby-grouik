@@ -24,6 +24,8 @@ $LOAD_PATH.unshift Pathname.new(__dir__)
 #
 # or using command line.
 module Grouik
+  require 'grouik/helpers'
+
   class << self
     # @return [Hash]
     def version_info
@@ -60,6 +62,8 @@ module Grouik
   @components = {
     process_class: Process,
     formatter: Formatter,
+    helpers: Grouik::Helpers,
+    inflector: ActiveSupport::Inflector,
     messager_factory: ->(&block) { Output::Message.new(&block) },
     loadable_factory: ->(base, path) { Loadable.new(base, path) },
   }
