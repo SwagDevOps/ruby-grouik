@@ -9,8 +9,6 @@ module Grouik::Concerns::Helpable
   # @param [String] target
   # @return [Grouik::Helpers]
   def helpers
-    require 'grouik/helpers'
-
-    Grouik::Helpers
+    Grouik.get(:helpers)
   end
 end
