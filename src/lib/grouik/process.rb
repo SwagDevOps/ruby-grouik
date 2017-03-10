@@ -2,6 +2,8 @@
 
 require 'pathname'
 
+require 'grouik/concerns'
+
 # Intended to wrap ``Grouik::Loader``
 #
 # Easify reusability through ``Grouik::Cli``
@@ -23,12 +25,12 @@ require 'pathname'
 # end
 # ~~~~
 class Grouik::Process
-  require 'grouik/process/helper'
-
   attr_accessor :template
   attr_accessor :bootstrap
   attr_accessor :verbose
   attr_reader   :output
+
+  include Grouik::Concerns::Helpable
 
   def initialize
     @output    = nil
@@ -94,7 +96,7 @@ class Grouik::Process
   #
   # @return [self]
   def display_errors
-    helper.display_errors
+    helpers.get(:process).display_errors(self)
 
     self
   end
@@ -103,7 +105,7 @@ class Grouik::Process
   #
   # @return [self]
   def display_status
-    helper.display_status
+    helpers.get(:process).display_status(self)
 
     self
   end
@@ -183,9 +185,5 @@ class Grouik::Process
   # @return [Array]
   def loader_accessors
     loader_attributes + loader_attributes.map { |m| ('%s=' % m).to_sym }
-  end
-
-  def helper
-    Helper.new(self)
   end
 end
