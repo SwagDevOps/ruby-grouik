@@ -22,7 +22,7 @@ class Project
     #
     # @return [Gem::Specification]
     def spec
-      Gem::Specification::load('%s/%s.gemspec' % [__dir__, name])
+      Gem::Specification::load('%s/%s.gemspec' % [Dir.pwd, name])
     end
 
     # @return [Hash]
