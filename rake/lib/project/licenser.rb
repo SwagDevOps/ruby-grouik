@@ -1,16 +1,27 @@
 # frozen_string_literal: true
 
 class Project::Licenser
-  attr_reader :license
+  attr_accessor :license
   attr_accessor :files
+  attr_reader   :patterns
 
-  def initialize(license, files=[])
+  def initialize(license=nil)
     @license = license
-    self.files = files
+    @patterns = []
+    @files = []
+
+    yield self if block_given?
   end
 
   def files
     @files.each.map { |file| Pathname.new(file) }
+  end
+
+  def license
+    @license.gsub(/\n\n/, "\n").lines.map do |line|
+      line.chomp!
+      line = (line[0] != '#' ? "# #{line}" : line) if line
+    end.join("\n")
   end
 
   def license_regexp
@@ -25,7 +36,10 @@ class Project::Licenser
 
       content = lines.clone
       if index > 0
-        content = lines[0..index] + license.lines + ["\n"] + lines[index..-1]
+        content = lines[0..index] +
+                  license.lines   +
+                  ["\n"]          +
+                  lines[index..-1]
       end
 
       puts content.join('')
