@@ -5,42 +5,40 @@
 # Samples of use:
 #
 # ~~~~
-# Project::Licenser.new do |a|
-#    a.patterns = ['src/bin/*', 'src/**/**.rb']
-#    a.license  = Project.version_info[:license]
+# Project::Licenser.process do |process|
+#    process.license  = Project.version_info[:license]
+#    process.patterns = ['src/bin/*', 'src/**/**.rb']
 # end.apply
 # ~~~~
 #
 # ~~~~
-# applier = Project::Licenser.new
-# applier.files += Dir.glob('src/bin/*')
-# applier.apply
+# Project::Licenser.process do |process|
+#     process.files += Dir.glob('src/bin/*')
+# end
 # ~~~~
 class Project::Licenser
   attr_accessor :license
   attr_accessor :files
   attr_reader   :patterns
 
+  class << self
+    def process(&block)
+      self.new.process(&block)
+    end
+  end
+
   def initialize
     @patterns = []
-    @files = []
-
-    yield self if block_given?
-
+    @files = Project.spec.files.reject { |f| !f.scan(/\.rb$/)[0] }
     @license ||= Project.version_info[:license]
 
-    return self unless Project.spec and @files.empty?
-
-    @files += Project.spec.files.reject { |f| !f.scan(/\.rb$/)[0] }
+    yield self if block_given?
   end
 
   # @param [Array<String>]
   def patterns=(patterns)
-    @files = []
-    patterns.each do |pattern|
-      @files += Dir.glob(pattern)
-    end
-
+    @files ||= []
+    patterns.each { |pattern| @files += Dir.glob(pattern) }
     @patterns = patterns
   end
 
@@ -65,10 +63,10 @@ class Project::Licenser
     /#{Regexp.quote(license)}/mi
   end
 
-  # Apply license
+  # Apply license on processable files
   #
   # @return [self]
-  def apply
+  def process
     yield self if block_given?
 
     files.each { |file| apply_license(file, license) }
@@ -93,23 +91,31 @@ class Project::Licenser
     index
   end
 
+  # Apply license on a file
+  #
+  # @param [Pathname] file
+  # @param [String] license
   def apply_license(file, license)
-    return file if file.read.scan(license_regexp)[0] or license.to_s.empty?
+    license    = license.to_s
+    regexp     = license_regexp
+    content    = file.read
+    licensable = !content.scan(regexp)[0] and !license.empty?
 
-    lines = file.read.lines
-    index = index_lines(lines)
-
-    content = lines.clone
-    if index > 0
-      content = lines[0..index] +
-                license.lines   +
-                ["\n"]          +
-                lines[index..-1]
+    if licensable
+      content = make_lines(content.lines).join('') if licensable
+      puts content
+      # file.write(content)
     end
 
-    puts content.join('')
-    # file.write(content.join(''))
-
     file
+  end
+
+  def make_lines(lines)
+    index = index_lines(lines)
+    lines = lines.clone
+
+    return lines if index <= 0
+
+    lines[0..index] + license.lines + ["\n"] + lines[index..-1]
   end
 end
