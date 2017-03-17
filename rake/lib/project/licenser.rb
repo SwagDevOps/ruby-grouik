@@ -28,9 +28,10 @@ class Project::Licenser
     yield self if block_given?
 
     @license ||= Project.version_info[:license]
-    if Project.spec and @files.empty?
-      @files += Project.spec.files.reject { |f| !f.scan(/\.rb$/)[0] }
-    end
+
+    return self unless Project.spec and @files.empty?
+
+    @files += Project.spec.files.reject { |f| !f.scan(/\.rb$/)[0] }
   end
 
   # @param [Array<String>]
@@ -54,37 +55,23 @@ class Project::Licenser
   def license
     @license.to_s.gsub(/\n{3}/mi, "\n\n").lines.map do |line|
       line.chomp!
-      line = (line[0] != '#' ? "# #{line}" : line) if line
+
+      line = "# #{line}" if line and line[0] != '#'
     end.join("\n")
   end
 
   # @return [Regexp]
   def license_regexp
-    %r{#{Regexp.quote(license)}}mi
+    /#{Regexp.quote(license)}/mi
   end
 
   # Apply license
   #
   # @return [self]
   def apply
-    files.each do |file|
-      next if file.read.scan(license_regexp)[0]
-      next if license.to_s.empty?
+    yield self if block_given?
 
-      lines = file.read.lines
-      index = index_lines(lines)
-
-      content = lines.clone
-      if index > 0
-        content = lines[0..index] +
-                  license.lines   +
-                  ["\n"]          +
-                  lines[index..-1]
-      end
-
-      puts content.join('')
-      # file.write(content.join(''))
-    end
+    files.each { |file| apply_license(file, license) }
 
     self
   end
@@ -98,13 +85,31 @@ class Project::Licenser
   def index_lines(lines)
     index = 0
     loop do
-      if lines[index] and lines[index][0] == '#'
-        index = index + 1
-      else
-        break
-      end
+      break unless lines[index] and lines[index][0] == '#'
+
+      index += 1
     end
 
     index
+  end
+
+  def apply_license(file, license)
+    return file if file.read.scan(license_regexp)[0] or license.to_s.empty?
+
+    lines = file.read.lines
+    index = index_lines(lines)
+
+    content = lines.clone
+    if index > 0
+      content = lines[0..index] +
+                license.lines   +
+                ["\n"]          +
+                lines[index..-1]
+    end
+
+    puts content.join('')
+    # file.write(content.join(''))
+
+    file
   end
 end
