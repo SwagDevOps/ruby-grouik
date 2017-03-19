@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'cliver'
-require 'securerandom'
-
 desc 'Build all the packages'
 task :gem => ['gem:gemspec', 'gem:package']
 
@@ -10,6 +7,7 @@ namespace :gem do
   # desc Rake::Task[:gem].comment
   task :package => ['gem:gemspec'] + Dir.glob('src/**/*.rb') do
     require 'rubygems/package_task'
+    require 'securerandom'
 
     # internal namespace name
     ns = '_%s' % SecureRandom.hex(4)
@@ -32,6 +30,8 @@ namespace :gem do
 
   desc 'Install gem'
   task :install => ['gem:package'] do
+    require 'cliver'
+
     spec = Project.spec
 
     sh(*[Cliver.detect(:sudo),
