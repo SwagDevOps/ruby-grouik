@@ -31,7 +31,7 @@ No options are required, no arguments are required. Easy (and safe) to use.
 CLI can also use [YAML](https://fr.wikipedia.org/wiki/YAML)
 configuration files, as arguments. They use the following structure:
 
-~~~~{.yaml}
+~~~~
 basedir: src
 paths:   [lib]
 output:  src/awesome.rb
