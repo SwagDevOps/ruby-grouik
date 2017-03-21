@@ -57,5 +57,21 @@ class Grouik::Helpers::Cli
 
       options
     end
+
+    # Read a config file
+    #
+    # @param [String] path
+    # @return [Hash]
+    def read_config(path)
+      file = Pathname.new(path.to_s)
+
+      if file.exist? and file.file?
+        h = YAML.safe_load(file.read).each_with_object({}) do |(k, v), h|
+          h[k.intern] = v;
+        end
+        return h
+      end
+      {}
+    end
   end
 end
