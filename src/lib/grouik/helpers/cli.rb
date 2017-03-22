@@ -58,6 +58,29 @@ class Grouik::Helpers::Cli
       options
     end
 
+    # Get the license
+    #
+    # @return [String]
+    def license
+      Grouik.version_info[:license].to_s.gsub(/\n{3}/mi, "\n\n")
+    end
+
+    # Get a displayable version
+    #
+    # Some inspiration taken from ``wget --version``
+    #
+    # @return [String]
+    def version_chapter
+      ['%s %s on %s' % [Grouik.name, Grouik::VERSION, host_os],
+       nil,
+       license].join("\n")
+    end
+
+    # @return [String]
+    def host_os
+      RbConfig::CONFIG['host_os']
+    end
+
     # Read a config file
     #
     # @param [String] path
@@ -67,7 +90,7 @@ class Grouik::Helpers::Cli
 
       if file.exist? and file.file?
         h = YAML.safe_load(file.read).each_with_object({}) do |(k, v), h|
-          h[k.intern] = v;
+          h[k.intern] = v
         end
         return h
       end
