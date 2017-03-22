@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'active_support/inflector'
-
 class Project
   class << self
     # @return [Symbol]
@@ -34,6 +32,8 @@ class Project
 
     # @return [ActiveSupport::Inflector]
     def inflector
+      require 'active_support/inflector'
+
       ActiveSupport::Inflector
     end
   end
