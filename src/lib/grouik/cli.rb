@@ -67,7 +67,7 @@ class Grouik::Cli
   # @return [OptionParser]
   def parser
     parser = helpers.get(:cli).make_parser(@options)
-    parser.banner = 'Usage: %s [options] [FILE]' % self.program_name
+    parser.banner = 'Usage: %s [OPTION]... [FILE]...' % program_name
 
     parser
   end
@@ -121,7 +121,14 @@ class Grouik::Cli
   #
   # @return [Fixnum]
   def run
-    parse!.processables.each do |processable|
+    parse!
+
+    if options[:version]
+      STDOUT.puts helpers.get(:cli).version_chapter
+      return 0
+    end
+
+    processables.each do |processable|
       Dir.chdir(processable.path) do
         process(processable.options)
       end

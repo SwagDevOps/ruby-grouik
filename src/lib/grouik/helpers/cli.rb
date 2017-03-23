@@ -26,6 +26,8 @@ class Grouik::Helpers::Cli
         { |v| options[:paths] = v }
         opts.on('--[no-]stats', 'Display some stats') \
         { |v| options[:stats] = v }
+        opts.on('--version', 'Display the version and exit') \
+        { |v| options[:version] = v }
       end
     end
 
