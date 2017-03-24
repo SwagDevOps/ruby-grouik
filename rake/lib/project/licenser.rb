@@ -103,8 +103,7 @@ class Project::Licenser
 
     if licensable
       content = make_lines(content.lines).join('') if licensable
-      puts content
-      # file.write(content)
+      file.write(content)
     end
 
     file
