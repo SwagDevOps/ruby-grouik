@@ -28,6 +28,13 @@ class Project
       ({version: subject.VERSION.to_s}.merge(subject.version_info)).freeze
     end
 
+    # Gem (packaged)
+    #
+    # @return [Pathname]
+    def gem
+      Pathname.new('pkg').join("#{name}-#{version}.gem")
+    end
+
     protected
 
     # @return [ActiveSupport::Inflector]
