@@ -6,7 +6,6 @@ module Grouik::Concerns::Helpable
 
   # Loads helper
   #
-  # @param [String] target
   # @return [Grouik::Helpers]
   def helpers
     Grouik.get(:helpers)
