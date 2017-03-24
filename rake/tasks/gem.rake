@@ -32,11 +32,27 @@ namespace :gem do
   task :install => ['gem:package'] do
     require 'cliver'
 
-    spec = Project.spec
-
     sh(*[Cliver.detect(:sudo),
          Cliver.detect!(:gem),
          :install,
-         "pkg/#{spec.name}-#{spec.version}.gem"].compact.map(&:to_s))
+         Project.gem].compact.map(&:to_s))
+  end
+
+  # @see http://guides.rubygems.org/publishing/
+  # @see rubygems-tasks
+  #
+  # Code mostly base on gem executable
+  desc 'Push gem up to the gem server'
+  task :push => ['gem:package'] do
+    ['rubygems',
+     'rubygems/gem_runner',
+     'rubygems/exceptions'].each { |i| require i }
+
+    args = ['push', Project.gem]
+    begin
+      Gem::GemRunner.new.run(args.map(&:to_s))
+    rescue Gem::SystemExitException => e
+      exit e.exit_code
+    end
   end
 end
