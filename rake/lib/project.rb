@@ -32,7 +32,7 @@ class Project
     #
     # @return [Pathname]
     def gem
-      Pathname.new('pkg').join("#{name}-#{version}.gem")
+      Pathname.new('pkg').join("#{spec.name}-#{spec.version}.gem")
     end
 
     protected
