@@ -16,25 +16,22 @@ class Grouik::Helpers::Cli
     # @param [Hash] options
     # @return [OptionParser]
     def make_parser(options = {})
-      OptionParser.new do |opts|
-        opts.on('--basedir=BASEDIR', 'Basedir [%s]' % options[:basedir]) \
-        { |v| options[:basedir] = v }
-        opts.on('-o=OUTPUT', '--output=OUTPUT', 'Output [/dev/stdout]') do |v|
-          options[:output] = v
-        end
-        opts.on('-r=REQUIRE', '--require=REQUIRE', 'Required file on startup') do |v|
-          options[:require] = v
-        end
+      parser = OptionParser.new
 
-        opts.on('--ignores x,y,z', Array, 'Ignores') \
-        { |v| options[:ignores] = v }
-        opts.on('--paths x,y,z', Array, 'Paths') \
-        { |v| options[:paths] = v }
-        opts.on('--[no-]stats', 'Display some stats') \
-        { |v| options[:stats] = v }
-        opts.on('--version', 'Display the version and exit') \
-        { |v| options[:version] = v }
+      {
+        basedir: ['--basedir=BASEDIR', 'Basedir [%s]' % options[:basedir]],
+        output: ['-o=OUTPUT', '--output=OUTPUT', 'Output [/dev/stdout]'],
+        require: ['-r=REQUIRE', '--require=REQUIRE',
+                  'Required file on startup'],
+        ignores: ['--ignores x,y,z', Array, 'Ignores'],
+        paths: ['--paths x,y,z', Array, 'Paths'],
+        stats: ['--[no-]stats', 'Display some stats'],
+        version: ['--version', 'Display the version and exit']
+      }.each do |k, v|
+        parser.on(*v) { |o| options[k] = o }
       end
+
+      parser
     end
 
     # Prepare options
@@ -95,14 +92,13 @@ class Grouik::Helpers::Cli
     # @return [Hash]
     def read_config(path)
       file = Pathname.new(path.to_s)
+      config = YAML.safe_load(file.read)
 
-      if file.exist? and file.file?
-        h = YAML.safe_load(file.read).each_with_object({}) do |(k, v), h|
-          h[k.intern] = v
-        end
-        return h
+      h = config.each_with_object({}) do |(k, v), n|
+        n[k.intern] = v
       end
-      {}
+
+      h
     end
   end
 end
