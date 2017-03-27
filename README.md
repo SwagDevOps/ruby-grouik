@@ -60,6 +60,26 @@ end.on_failure { exit Errno::ECANCELED::Errno }
 
 ``Grouik::Process`` provides methods to be executed on ``success``/``failure``.
 
+### Templating
+
+~~~~{.ruby}
+require 'pathname'
+
+$:.unshift Pathname.new(__dir__).join('lib')
+
+#{@requirement.call}
+~~~~
+
+Grouik uses [``Tenjin``](http://www.kuwata-lab.com/tenjin/) as template engine.
+As a result, the following preprocessing statement:
+
+~~~~{.ruby}
+#{@requirement.call}
+~~~~
+
+wil be rendered in as many statements as necessary,
+including each source file listed during the process.
+
 ## Alternatives
 
 * [Autoloaded](https://njonsson.github.io/autoloaded/)
