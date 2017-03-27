@@ -10,75 +10,73 @@
 #
 # Main methods are ``display_errors`` and ``display_status``
 class Grouik::Helpers::Process
-  class << self
-    # Display loading errors
-    #
-    # @param [Grouik::Process] process
-    # @return [self]
-    def display_errors(process)
-      process.errors.each do |_k, struct|
-        Grouik.message do |m|
-          m.stream  = STDERR
-          m.type    = 'error'
-          m.content = ('%s:%s: %s' % [
-            struct.source,
-            struct.line,
-            struct.message,
-          ])
-        end
-      end
-    end
-
-    # Display (on ``STDERR``) loader related statistics
-    #
-    # @param [Grouik::Process] process
-    # @return [self]
-    def display_status(process)
-      message  = '%s: %s files; %s iterations; %s errors (%.4f) [%s]'
-      loader   = process.loader
-
+  # Display loading errors
+  #
+  # @param [Grouik::Process] process
+  # @return [self]
+  def display_errors(process)
+    process.errors.each do |_k, struct|
       Grouik.message do |m|
         m.stream  = STDERR
-        m.type    = 'status_%s' % status(process)
-        m.content = (message %
-                     [
-                       status(process).to_s.capitalize,
-                       loader.loadables.size,
-                       loader.attempts,
-                       loader.errors.size,
-                       loader.stats ? loader.stats.real : 0,
-                       format_filepath(process.output)
+        m.type    = 'error'
+        m.content = ('%s:%s: %s' % [
+                       struct.source,
+                       struct.line,
+                       struct.message,
                      ])
       end
-      self
     end
+  end
 
-    # Denote status from process
-    #
-    # @return [Symbol]
-    def status(process)
-      statuses = { true => :success, false => :failure }
+  # Display (on ``STDERR``) loader related statistics
+  #
+  # @param [Grouik::Process] process
+  # @return [self]
+  def display_status(process)
+    message  = '%s: %s files; %s iterations; %s errors (%.4f) [%s]'
+    loader   = process.loader
 
-      statuses.fetch(process.success?)
+    Grouik.message do |m|
+      m.stream  = STDERR
+      m.type    = 'status_%s' % status(process)
+      m.content = (message %
+                   [
+                     status(process).to_s.capitalize,
+                     loader.loadables.size,
+                     loader.attempts,
+                     loader.errors.size,
+                     loader.stats ? loader.stats.real : 0,
+                     format_filepath(process.output)
+                   ])
     end
+    self
+  end
 
-    protected
+  # Denote status from process
+  #
+  # @return [Symbol]
+  def status(process)
+    statuses = { true => :success, false => :failure }
 
-    # Format a filepath with a ``require`` format
-    #
-    # @param [Pathname|String|Object] filepath
-    def format_filepath(filepath)
-      filepath = filepath.to_s
+    statuses.fetch(process.success?)
+  end
 
-      $LOAD_PATH.each do |path|
-        regexp = %r{^#{Regexp.quote(path.to_s)}\/}
-        if regexp.match(filepath)
-          filepath.gsub!(regexp, '').gsub!(/\.rb$/, '')
-          break
-        end
+  protected
+
+  # Format a filepath with a ``require`` format
+  #
+  # @param [Pathname|String|Object] filepath
+  def format_filepath(filepath)
+    filepath = filepath.to_s
+
+    $LOAD_PATH.each do |path|
+      regexp = %r{^#{Regexp.quote(path.to_s)}\/}
+      if regexp.match(filepath)
+        filepath.gsub!(regexp, '').gsub!(/\.rb$/, '')
+        break
       end
-
-      filepath
     end
+
+    filepath
   end
 end

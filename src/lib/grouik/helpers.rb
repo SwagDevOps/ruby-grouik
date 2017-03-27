@@ -23,7 +23,7 @@ module Grouik::Helpers
 
       require load_dir.join(target.to_s) unless const_defined?(class_name)
 
-      inflector.constantize(class_name)
+      inflector.constantize(class_name).new
     end
 
     # Directory where helpers stand
