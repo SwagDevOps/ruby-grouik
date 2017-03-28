@@ -89,6 +89,21 @@ On failure, CLI __SHOULD__ exit with a ``125`` (``ECANCELED``) return code.
 
 The output file is overwritten when the process is a success.
 
+## Installation
+
+~~~~
+gem install grouik
+~~~~
+
+alternatively, install a development version (from github):
+
+~~~~
+git clone https://github.com/SwagDevOps/ruby-grouik grouik
+cd !$
+bundle install --path vendor/bundle
+rake gem:install
+~~~~
+
 ## Alternatives
 
 * [Autoloaded](https://njonsson.github.io/autoloaded/)
