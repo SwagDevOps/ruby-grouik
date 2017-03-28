@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
-file "#{Project.name}.gemspec" =>
-     ["src/#{Project.name}.gemspec.tpl", 'Gemfile'] do
-  require 'ostruct'
-  require 'pathname'
-  require 'gemspec_deps_gen'
-  require 'tenjin'
+file "#{Project.name}.gemspec" => \
+     FileList.new("src/#{Project.name}.gemspec.tpl",
+                  'Gemfile',
+                  'src/**/*.rb',
+                  'src/**/version_info.yml') do
+  [:ostruct, :pathname, :gemspec_deps_gen, :tenjin].each do |required|
+    require required
+  end
 
   tools = OpenStruct.new(
     deps_gen: GemspecDepsGen.new,
