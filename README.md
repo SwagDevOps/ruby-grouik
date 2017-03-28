@@ -1,5 +1,7 @@
 # Adopt a Pig (Programmable Inclusions Generator)
 
+Grouik is a french onomatopoeia of a pig's shriek.
+
 Tired to require your own library file transversally from one file to
 another? If so, you sould give a try to ``Grouik``. It will allow you
 to completely automate this task.
@@ -60,12 +62,10 @@ end.on_failure { exit Errno::ECANCELED::Errno }
 
 ``Grouik::Process`` provides methods to be executed on ``success``/``failure``.
 
-### Templating
+## Templating
 
 ~~~~{.ruby}
-require 'pathname'
-
-$:.unshift Pathname.new(__dir__).join('lib')
+$:.unshift "#{__dir__}/lib"
 
 #{@requirement.call}
 ~~~~
@@ -78,7 +78,16 @@ As a result, the following preprocessing statement:
 ~~~~
 
 wil be rendered in as many statements as necessary,
-including each source file listed during the process.
+including each source file listed during the process,
+ordered by successful loading order.
+
+## Principles
+
+Grouik will attempt ``(n^2)+1`` times before failing.
+Success is defined by a complete (without error) loading of all entries.
+On failure, CLI __SHOULD__ exit with a ``125`` (``ECANCELED``) return code.
+
+The output file is overwritten when the process is a success.
 
 ## Alternatives
 
