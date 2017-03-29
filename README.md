@@ -3,7 +3,7 @@
 Grouik is a french onomatopoeia of a pig's shriek.
 
 Tired to require your own library file transversally from one file to
-another? If so, you sould give a try to ``Grouik``. It will allow you
+another? If so, you should give a try to ``Grouik``. It will allow you
 to completely automate this task.
 
 ``Grouik`` eliminates the drudgery of handcrafting `require`
@@ -77,7 +77,7 @@ As a result, the following preprocessing statement:
 #{@requirement.call}
 ~~~~
 
-wil be rendered in as many statements as necessary,
+will be rendered in as many statements as necessary,
 including each source file listed during the process,
 ordered by successful loading order.
 
