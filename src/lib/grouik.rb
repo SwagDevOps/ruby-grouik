@@ -30,15 +30,14 @@ $LOAD_PATH.unshift Pathname.new(__dir__)
 #
 # or using command line.
 module Grouik
-  require 'grouik/helpers'
-  require 'grouik/concerns'
-
-  include Concerns::Versionable
-
   # loads sub(modules|classes)
-  [:loader, :loadable, :formatter, :process, :output].each do |r|
+  [:helpers, :concerns,
+   :loader, :loadable,
+   :formatter, :process, :output].each do |r|
     require '%s/%s' % [ActiveSupport::Inflector.underscore(name), r]
   end
+
+  include Concerns::Versionable
 
   @components = {
     process_class: Process,
