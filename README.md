@@ -92,7 +92,7 @@ The output file is overwritten when the process is a success.
 ## Installation
 
 ~~~~
-gem install grouik
+sudo gem install grouik
 ~~~~
 
 alternatively, install a development version (from github):
