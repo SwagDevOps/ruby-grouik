@@ -10,7 +10,7 @@
 module Grouik::Concerns
   require 'active_support/concern'
 
-  [:helpable].each do |concern|
+  [:helpable, :versionable].each do |concern|
     require 'grouik/concerns/%s' % concern
   end
 end
