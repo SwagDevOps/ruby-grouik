@@ -49,7 +49,7 @@ Note: configurations can be overriden by options given on the command-line.
 ``Grouik`` can be programmatically used through
 [``Rake``](http://rake.rubyforge.org/) tasks:
 
-~~~~{.ruby}
+```ruby
 Grouik.process do |process|
     process.basedir   = 'src'
     process.paths     = ['lib']
@@ -58,24 +58,24 @@ Grouik.process do |process|
     process.template  = 'lib/awesome.tpl'
     process.bootstrap = nil
 end.on_failure { exit Errno::ECANCELED::Errno }
-~~~~
+```
 
 ``Grouik::Process`` provides methods to be executed on ``success``/``failure``.
 
 ## Templating
 
-~~~~{.ruby}
+```ruby
 $:.unshift "#{__dir__}/lib"
 
 #{@requirement.call}
-~~~~
+```
 
 Grouik uses [``Tenjin``](http://www.kuwata-lab.com/tenjin/) as template engine.
 As a result, the following preprocessing statement:
 
-~~~~{.ruby}
+```ruby
 #{@requirement.call}
-~~~~
+```
 
 will be rendered in as many statements as necessary,
 including each source file listed during the process,
