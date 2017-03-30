@@ -77,7 +77,7 @@ As a result, the following preprocessing statement:
 #{@requirement.call}
 ```
 
-will be rendered in as many statements as necessary,
+will be rendered in as many ``require`` statement as necessary,
 including each source file listed during the process,
 ordered by successful loading order.
 
