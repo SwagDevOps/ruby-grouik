@@ -6,7 +6,7 @@ file "#{Project.name}.gemspec" => \
                   'src/**/*.rb',
                   'src/**/version_info.yml') do
   [:ostruct, :pathname, :gemspec_deps_gen, :tenjin].each do |required|
-    require required
+    require required.to_s
   end
 
   tools = OpenStruct.new(
