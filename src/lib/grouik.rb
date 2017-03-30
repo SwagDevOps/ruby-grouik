@@ -8,9 +8,9 @@
 
 require 'pathname'
 require 'active_support/inflector'
-require 'version_info'
 
 $LOAD_PATH.unshift Pathname.new(__dir__)
+
 
 # Produce a ``require`` file, resolving classes dependencies
 #
@@ -31,35 +31,10 @@ $LOAD_PATH.unshift Pathname.new(__dir__)
 # or using command line.
 module Grouik
   require 'grouik/helpers'
+  require 'grouik/concerns'
 
-  class << self
-    # @return [Hash]
-    def version_info
-      unless self.const_defined?(:VERSION)
-        include VersionInfo
+  include Concerns::Versionable
 
-        VersionInfo.file_format = :yaml
-        VERSION.file_name = self.version_filepath
-        VERSION.load
-      end
-
-      VERSION.to_hash.freeze
-    end
-
-    protected
-
-    # Get path to the ``version`` file
-    #
-    # @return [Pathname]
-    def version_filepath
-      name = ActiveSupport::Inflector.underscore(self.name)
-
-      Pathname.new(__dir__).join(name, 'version_info.yml')
-    end
-  end
-
-  # registers version_info
-  self.version_info
   # loads sub(modules|classes)
   [:loader, :loadable, :formatter, :process, :output].each do |r|
     require '%s/%s' % [ActiveSupport::Inflector.underscore(name), r]
