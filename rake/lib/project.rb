@@ -4,7 +4,9 @@ class Project
   class << self
     # @return [Symbol]
     def name
-      :grouik
+      require 'dotenv/load'
+
+      ENV.fetch('PROJECT_NAME').to_sym
     end
 
     # Main class (subject of project)
@@ -13,6 +15,7 @@ class Project
     def subject
       require '%s/src/lib/%s' % [Dir.pwd, Project.name]
 
+      name = self.name.to_s.gsub('-', '/')
       inflector.constantize(inflector.classify(name))
     end
 
