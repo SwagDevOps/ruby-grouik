@@ -21,8 +21,10 @@ Gem::Specification.new do |s|
   s.require_paths = ['src/lib']
   s.bindir        = 'src/bin'
   s.executables   = ['#{@name}']
-  s.files         = Dir.glob('src/**/**.rb') + \
-                    Dir.glob('src/**/version_info.yml')
+  s.files         = ['.yardopts',
+                     'src/**/**.rb',
+                     'src/**/version_info.yml'
+                     ].map { |pt| Dir.glob(pt) }.flatten
 
   #{@dependencies}
 end
