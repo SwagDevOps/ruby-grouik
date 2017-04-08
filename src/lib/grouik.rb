@@ -16,7 +16,7 @@ $LOAD_PATH.unshift Pathname.new(__dir__)
 #
 # Sample of use:
 #
-# ~~~~
+# ```
 # Grouik.process do |process|
 #      process.basedir   = './path/to/my/project'
 #      process.paths     = ['lib']
@@ -26,7 +26,7 @@ $LOAD_PATH.unshift Pathname.new(__dir__)
 #      process.bootstrap = nil
 #      process.verbose   = true
 # end.success? ? 0 : 1
-# ~~~~
+# ```
 #
 # or using command line.
 module Grouik

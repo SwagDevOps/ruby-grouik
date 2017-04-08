@@ -17,7 +17,7 @@ require 'grouik/concerns'
 #
 # Sample of use:
 #
-# ~~~~
+# ```
 # task 'src/ceres.rb' do
 #  require 'grouik'
 #
@@ -29,7 +29,7 @@ require 'grouik/concerns'
 #    process.template = 'src/ceres.tpl'
 #  end.on_failure { exit Errno::ECANCELED::Errno }
 # end
-# ~~~~
+# ```
 class Grouik::Process
   attr_accessor :template
   attr_accessor :bootstrap

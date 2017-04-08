@@ -18,7 +18,7 @@ or any other command-line interface.
 
 ## Command Line Interface
 
-~~~~
+```
 Usage: grouik [OPTION]... [FILE]...
         --basedir=BASEDIR            Basedir [.]
     -o, --output=OUTPUT              Output [/dev/stdout]
@@ -26,21 +26,21 @@ Usage: grouik [OPTION]... [FILE]...
         --ignores x,y,z              Ignores
         --paths x,y,z                Paths
         --[no-]stats                 Display some stats
-~~~~
+```
 
 No options are required, no arguments are required. Easy (and safe) to use.
 
 CLI can also use [YAML](https://fr.wikipedia.org/wiki/YAML)
 configuration files, as arguments. They use the following structure:
 
-~~~~
+```
 basedir: src
 paths:   [lib]
 output:  src/awesome.rb
 require: src/config/init
 ignores: [^useless$, ^pointless$]
 template: src/awesome.tpl
-~~~~
+```
 
 Note: configurations can be overriden by options given on the command-line.
 
@@ -91,18 +91,18 @@ The output file is overwritten when the process is a success.
 
 ## Installation
 
-~~~~
+```
 sudo gem install grouik
-~~~~
+```
 
 alternatively, install a development version (from github):
 
-~~~~
+```
 git clone https://github.com/SwagDevOps/ruby-grouik grouik
 cd !$
 bundle install --path vendor/bundle
 rake gem:install
-~~~~
+```
 
 ## Alternatives
 
