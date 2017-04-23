@@ -44,7 +44,7 @@ module Grouik
   }
 
   class << self
-    # Provides access to components
+    # Provide access to components
     #
     # @return [Hash]
     def components
@@ -77,6 +77,7 @@ module Grouik
 
     def message(&block)
       self.get(:messager_factory).call(&block).send
+
       self
     end
   end
