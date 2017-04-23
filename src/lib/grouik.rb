@@ -6,11 +6,7 @@
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-require 'pathname'
-require 'active_support/inflector'
-
-$LOAD_PATH.unshift Pathname.new(__dir__)
-
+$LOAD_PATH.unshift __dir__
 
 # Produce a ``require`` file, resolving classes dependencies
 #
@@ -34,7 +30,7 @@ module Grouik
   [:helpers, :concerns,
    :loader, :loadable,
    :formatter, :process, :output].each do |r|
-    require '%s/%s' % [ActiveSupport::Inflector.underscore(name), r]
+    require '%s/%s' % [name.downcase, r]
   end
 
   include Concerns::Versionable
@@ -43,13 +39,25 @@ module Grouik
     process_class: Process,
     formatter: Formatter,
     helpers: Grouik::Helpers,
-    inflector: ActiveSupport::Inflector,
     messager_factory: ->(&block) { Output::Message.new(&block) },
     loadable_factory: ->(base, path) { Loadable.new(base, path) },
   }
 
   class << self
-    attr_accessor :components
+    # Provides access to components
+    #
+    # @return [Hash]
+    def components
+      components = @components
+
+      components[:inflector] ||= proc do
+        require 'active_support/inflector'
+
+        ActiveSupport::Inflector
+      end.call
+
+      components
+    end
 
     # Access to components
     #
